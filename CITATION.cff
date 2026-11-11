@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this code, the released weights or the prediction maps, please cite https://github.com/darskkaa/SpectraMambaNet (paper details below)."
+title: "SpectraMambaNet"
+type: software
+authors:
+  - name: "SpectraMambaNet authors"
+repository-code: "https://github.com/darskkaa/SpectraMambaNet"
+license: MIT
+keywords:
+  - polyp segmentation
+  - medical image segmentation
+  - state-space models
+  - Mamba
+  - colonoscopy
+preferred-citation:
+  type: conference-paper
+  title: "Tri-Axial State-Space Polyp Segmentation with Zero-Initialized Boundary Calibration"
+  authors:
+    - name: "SpectraMambaNet authors"
+  collection-title: "Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)"
+  conference:
+    name: "IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)"
+  year: 2027

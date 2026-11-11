@@ -1,0 +1,8 @@
+# The selective-scan CUDA kernels that training needs (Linux, NVIDIA GPU). They compile
+# against the torch that is already installed, so pip must not isolate the build:
+#   pip install -r requirements.txt
+#   pip install --no-build-isolation -r requirements_colab.txt
+# Pinned to the versions the published run used. colab_train_launcher.py builds them once
+# per torch/Python combination and caches the wheels to Drive.
+causal-conv1d==1.6.2.post1
+mamba-ssm==2.3.2.post1

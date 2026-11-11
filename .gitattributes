@@ -1,0 +1,10 @@
+# Git stores text with LF line endings; checkouts convert per platform, except shell scripts,
+# which stay LF so bash can run them from a Windows checkout.
+* text=auto
+*.sh text eol=lf
+
+*.png binary
+*.jpg binary
+*.ckpt binary
+*.pth binary
+*.pt binary

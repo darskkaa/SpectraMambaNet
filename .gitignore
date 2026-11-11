@@ -1,0 +1,32 @@
+# Weights ship as release assets — 140 MB is over GitHub's blob limit.
+*.ckpt
+*.pth
+*.pt
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Datasets are not redistributed here.
+TrainDataset/
+TestDataset/
+/data/
+
+# Outputs of the README's commands.
+lightning_logs/
+runs/
+/preds/
+/fin2_scored.json
+/significance.json
+/verify.log
+
+*.egg-info/
+.venv/
+venv/
+.DS_Store
+
+# Editor and tool state.
+.vscode/
+.idea/
+.serena/

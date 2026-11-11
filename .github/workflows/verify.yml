@@ -1,0 +1,56 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Re-derive the published numbers on CPU
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install CPU PyTorch and the requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Download the released weights
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download fin2-weights --pattern fin2_soup8.ckpt --repo "$GITHUB_REPOSITORY"
+          echo "598de21496dbc7f7c0619ea0d2401c7dc28b6d5885c638359d695e0c69401e0b  fin2_soup8.ckpt" | sha256sum -c -
+
+      - name: Mamba key and shape parity against the CPU scan
+        run: python scripts/verify_mamba_ref.py fin2_soup8.ckpt --keys-only
+
+      - name: Re-derive every claim in MANIFEST.md
+        run: |
+          python scripts/verify_release.py | tee verify.log
+          grep -qx "129 passed, 0 FAILED" verify.log

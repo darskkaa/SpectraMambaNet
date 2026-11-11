@@ -1,0 +1,1476 @@
+import urllib.request
+from google.colab import userdata
+T = (userdata.get("GITHUB_TOKEN") or "").strip()
+u = ("https://api.github.com/repos/darskkaa/polp_wacv/contents/"
+     "docs/runs/ablation_colab_cell.py?ref=sota-fcc-boundary-calib")
+r = urllib.request.Request(u, headers={"Authorization": f"Bearer {T}",
+    "Accept": "application/vnd.github.v3.raw", "X-GitHub-Api-Version": "2022-11-28"})
+exec(compile(urllib.request.urlopen(r, timeout=60).read().decode(),
+             "ablation_colab_cell.py", "exec"), globals())Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount("/content/drive", force_remount=True).
+======================================================================
+ABLATION SWEEP — 4 arms, 40 epochs each, ~2 h per arm (measured on an L4: M5 1.89 h, M3 1.97 h)
+  order     : R0 -> R1 -> R2 -> R3
+  not running: C0, C1, C2, C3, C4, C5, M0, M1, M2, M3, M4, M5 — off by default. If you meant to split the sweep across two sessions, the lists must be DISJOINT.
+  reference : R3 — in this session's order
+  already done : (none)
+  to run       : R0, R1, R2, R3
+  progress file: /content/drive/MyDrive/abl_progress.json
+======================================================================
+If the runtime dies, re-run this exact cell. Finished arms are skipped in seconds and
+an interrupted arm resumes from its own Drive backup at the epoch it reached.
+======================================================================
+
+[setup] Drive free: 168.0 GB (need ~4.3 for 4 arms)
+[setup] launcher fetched from sota-fcc-boundary-calib (36595 bytes)
+
+
+======================================================================
+[1/4] starting R0 — 0s into the sweep, Tue 19:21
+======================================================================
+
+######################################################################
+# ARM R0 — BASELINE — PVTv2-B2 + U-shaped decoder, BCE+IoU, generic augmentation
+#   flags  : --no-mamba-bottleneck
+#   backup : /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R0
+#   log    : /content/drive/MyDrive/abl_R0_log.txt
+######################################################################
+
+[setup] FRESH start — no existing backup
+[setup] cleared /content/polp_wacv/lightning_logs (the launcher restores this arm's own copy if any)
+======================================================================
+PRE-FLIGHT R0 (--dry-run): full env/dataset/mamba audit, no training.
+======================================================================
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Updating 2167a5a..b8ed1e2
+Fast-forward
+ docs/analysis/ablation_plan_fin2.md | 221 ++++++++++++++++++++++++++++++++++++
+ docs/runs/ablation_colab_cell.py    |  76 ++++++++++++-
+ 2 files changed, 295 insertions(+), 2 deletions(-)
+ create mode 100644 docs/analysis/ablation_plan_fin2.md
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R0 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R0_seed0.json --no-fcc-decoder --no-fcc-region-calib --no-mamba-bottleneck
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R0_seed0.json --no-fcc-decoder --no-fcc-region-calib --no-mamba-bottleneck
+
+[launcher] --dry-run set, exiting without launching training.
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R0/runs
+Checkpoint backup complete (runs: 2 copied, 0 unchanged).
+
+======================================================================
+PRE-FLIGHT PASSED in 0.2 min. 22 flags present, 12 absent.
+LAUNCHING R0 — 40 epochs, code @ b8ed1e28. Log: /content/drive/MyDrive/abl_R0_log.txt
+======================================================================
+
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R0 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R0_seed0.json --no-fcc-decoder --no-fcc-region-calib --no-mamba-bottleneck
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R0_seed0.json --no-fcc-decoder --no-fcc-region-calib --no-mamba-bottleneck
+
+Seed set to 0
+[precision] lightning=bf16-mixed float32_matmul=medium
+[run-config] model=ours encoder=pvt_v2_b2 recipe=ours seed=0 epochs=40 bs=16 accum=1 lr=0.0001 wd=0.0001 aug=light hat_prob=0.0 fda=0.0@beta0.01 val_fraction=0.0 split_seed=0 lr_schedule=cosine warmup=5 restart_cycle_len=20 encoder_lr_scale=1.0 clip=value@0.5 multi_scale=True step_per_scale=True use_fcc_decoder=False fcc_region_calib=False fcc_edge_weight=3.0 fcc_share_bn=False fcc_channel=64 fcc_reduce_octave=False bce_unweighted=True iou_smooth=1.0 ms_mask_interp=bilinear img_size=352 fullres_head=False select_on_test=False select_on=indomain select_weights=raw use_rfp=False edge_stride=8 mamba_stage=bottleneck mamba_scan=axial mamba_freq_axis=True mamba_ls_init=0.0001 freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq fcc_region_proto=False ema_decay=0.0 precision=bf16-mixed matmul_precision=medium use_mamba_bottleneck=False ds_mutation=False mamba_bidirectional=False tversky=0.0@(0.7,0.3) boundary_dice=0.0 contrast_weight=0.0
+
+[check] [run-config] matches all 24 required settings for R0.
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[params] total=31.469 M encoder=24.850 M
+WARNING: --val-fraction 0 - no held-out split, so there is no blind selection signal. Report 'last', or pass --select-on-test to reproduce the published max-over-epochs-on-test rule and label the number accordingly.
+Using bfloat16 Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+--fresh: no lightning_logs/ found, already clean.
+⏬ Loading WACV Benchmark Train Dataset from /content/TrainDataset (aug=light, hat_prob=0.0, img_size=352)...
+✅ Loaded 1450 train / 0 val images (val_fraction=0.0, split seed=0)
+   effective train images/epoch: 1440 of 1450 (0 held out, 10 dropped by drop_last at batch_size=16)
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/model_summary/model_summary.py:242: Precision bf16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
+┏━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name  ┃ Type            ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model │ SpectraMambaNet │ 31.5 M │ train │     0 │
+└───┴───────┴─────────────────┴────────┴───────┴───────┘
+Trainable params: 31.5 M                                                        
+Non-trainable params: 0                                                         
+Total params: 31.5 M                                                            
+Total estimated model params size (MB): 125.877                                 
+Modules in train mode: 409                                                      
+Modules in eval mode: 0                                                         
+Total FLOPs: 0                                                                  
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 000/40 | Train Loss: 2.2476 | Val Dice: N/A
+Epoch 001/40 | Train Loss: 1.5830 | Val Dice: N/A
+
+[eta] 1.0 min/epoch measured. This arm: 38 epochs left -> ~0.6 h, done around 20:05. Whole sweep (3 more arms after this one): ~2.7 h -> Tue 22:06.
+
+Epoch 002/40 | Train Loss: 1.1225 | Val Dice: N/A
+Epoch 003/40 | Train Loss: 0.9391 | Val Dice: N/A
+Epoch 004/40 | Train Loss: 0.8235 | Val Dice: N/A
+Epoch 005/40 | Train Loss: 0.7300 | Val Dice: N/A
+Epoch 006/40 | Train Loss: 0.6451 | Val Dice: N/A
+Epoch 007/40 | Train Loss: 0.5741 | Val Dice: N/A
+Epoch 008/40 | Train Loss: 0.5510 | Val Dice: N/A
+Epoch 009/40 | Train Loss: 0.4845 | Val Dice: N/A
+Epoch 010/40 | Train Loss: 0.4703 | Val Dice: N/A
+Epoch 011/40 | Train Loss: 0.4753 | Val Dice: N/A
+Epoch 012/40 | Train Loss: 0.4359 | Val Dice: N/A
+Epoch 013/40 | Train Loss: 0.4326 | Val Dice: N/A
+Epoch 014/40 | Train Loss: 0.4192 | Val Dice: N/A
+Epoch 015/40 | Train Loss: 0.3837 | Val Dice: N/A
+Epoch 016/40 | Train Loss: 0.3899 | Val Dice: N/A
+Epoch 017/40 | Train Loss: 0.3787 | Val Dice: N/A
+Epoch 018/40 | Train Loss: 0.3514 | Val Dice: N/A
+Epoch 019/40 | Train Loss: 0.3406 | Val Dice: N/A
+
+--- Zero-shot MONITORING at epoch 20 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8927 | meanIoU: 0.8246 | S-m: 0.9402 | mean E-m: 0.9648 | max E-m: 0.9740 | max Fm(β²=0.3): 0.9168 | wFm: 0.8810 | MAE: 0.0077 | Recall@0.5: 0.9215 | HD95@0.5: 18.11px
+Dataset: CVC-CLINICDB    | meanDice: 0.9070 | meanIoU: 0.8561 | S-m: 0.9418 | mean E-m: 0.9611 | max E-m: 0.9689 | max Fm(β²=0.3): 0.9271 | wFm: 0.9095 | MAE: 0.0095 | Recall@0.5: 0.9309 | HD95@0.5: 10.26px
+Dataset: CVC-COLONDB     | meanDice: 0.7994 | meanIoU: 0.7177 | S-m: 0.8616 | mean E-m: 0.8984 | max E-m: 0.9070 | max Fm(β²=0.3): 0.8358 | wFm: 0.7832 | MAE: 0.0356 | Recall@0.5: 0.8177 | HD95@0.5: 56.50px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7965 | meanIoU: 0.7198 | S-m: 0.8858 | mean E-m: 0.9050 | max E-m: 0.9145 | max Fm(β²=0.3): 0.8158 | wFm: 0.7672 | MAE: 0.0142 | Recall@0.5: 0.8539 | HD95@0.5: 118.60px
+Dataset: KVASIR          | meanDice: 0.9055 | meanIoU: 0.8523 | S-m: 0.9246 | mean E-m: 0.9560 | max E-m: 0.9671 | max Fm(β²=0.3): 0.9265 | wFm: 0.8980 | MAE: 0.0261 | Recall@0.5: 0.9082 | HD95@0.5: 40.40px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8295  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8602 ---
+Epoch 020/40 | Train Loss: 0.3389 | Val Dice: N/A
+Epoch 021/40 | Train Loss: 0.3220 | Val Dice: N/A
+Epoch 022/40 | Train Loss: 0.3172 | Val Dice: N/A
+Epoch 023/40 | Train Loss: 0.3118 | Val Dice: N/A
+Epoch 024/40 | Train Loss: 0.2991 | Val Dice: N/A
+Epoch 025/40 | Train Loss: 0.2948 | Val Dice: N/A
+Epoch 026/40 | Train Loss: 0.2879 | Val Dice: N/A
+Epoch 027/40 | Train Loss: 0.2896 | Val Dice: N/A
+Epoch 028/40 | Train Loss: 0.2785 | Val Dice: N/A
+Epoch 029/40 | Train Loss: 0.2739 | Val Dice: N/A
+Epoch 030/40 | Train Loss: 0.2737 | Val Dice: N/A
+Epoch 031/40 | Train Loss: 0.2667 | Val Dice: N/A
+Epoch 032/40 | Train Loss: 0.2674 | Val Dice: N/A
+Epoch 033/40 | Train Loss: 0.2597 | Val Dice: N/A
+Epoch 034/40 | Train Loss: 0.2549 | Val Dice: N/A
+Epoch 035/40 | Train Loss: 0.2555 | Val Dice: N/A
+Epoch 036/40 | Train Loss: 0.2520 | Val Dice: N/A
+Epoch 037/40 | Train Loss: 0.2516 | Val Dice: N/A
+Epoch 038/40 | Train Loss: 0.2500 | Val Dice: N/A
+Epoch 039/40 | Train Loss: 0.2496 | Val Dice: N/A
+
+--- Zero-shot MONITORING at epoch 40 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8926 | meanIoU: 0.8254 | S-m: 0.9383 | mean E-m: 0.9625 | max E-m: 0.9805 | max Fm(β²=0.3): 0.9203 | wFm: 0.8729 | MAE: 0.0071 | Recall@0.5: 0.9523 | HD95@0.5: 16.43px
+Dataset: CVC-CLINICDB    | meanDice: 0.9243 | meanIoU: 0.8761 | S-m: 0.9476 | mean E-m: 0.9722 | max E-m: 0.9788 | max Fm(β²=0.3): 0.9408 | wFm: 0.9222 | MAE: 0.0081 | Recall@0.5: 0.9554 | HD95@0.5: 8.05px
+Dataset: CVC-COLONDB     | meanDice: 0.8053 | meanIoU: 0.7242 | S-m: 0.8698 | mean E-m: 0.9057 | max E-m: 0.9136 | max Fm(β²=0.3): 0.8290 | wFm: 0.7912 | MAE: 0.0294 | Recall@0.5: 0.8276 | HD95@0.5: 49.38px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.8056 | meanIoU: 0.7281 | S-m: 0.8869 | mean E-m: 0.9208 | max E-m: 0.9295 | max Fm(β²=0.3): 0.8208 | wFm: 0.7753 | MAE: 0.0145 | Recall@0.5: 0.8682 | HD95@0.5: 101.23px
+Dataset: KVASIR          | meanDice: 0.9053 | meanIoU: 0.8565 | S-m: 0.9240 | mean E-m: 0.9556 | max E-m: 0.9632 | max Fm(β²=0.3): 0.9249 | wFm: 0.8999 | MAE: 0.0248 | Recall@0.5: 0.9098 | HD95@0.5: 45.67px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8345  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8666 ---
+`Trainer.fit` stopped: `max_epochs=40` reached.
+
+Saving lightning_logs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R0/lightning_logs
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R0/runs
+Checkpoint backup complete (lightning_logs: 3 copied, 2 unchanged; runs: 1 copied, 2 unchanged).
+
+[train] exit 0 after 0.83 h. Log at /content/drive/MyDrive/abl_R0_log.txt
+
+======================================================================
+SCORING R0 on last.ckpt
+======================================================================
+[score] checkpoint: /content/polp_wacv/lightning_logs/version_0/checkpoints/last.ckpt
+[score] epoch=39 mamba_freq_axis=True use_mamba_bottleneck=False mamba_stage=bottleneck mamba_scan=axial
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8926 | meanIoU: 0.8255 | S-m: 0.9383 | mean E-m: 0.9625 | max E-m: 0.9805 | max Fm(β²=0.3): 0.9203 | wFm: 0.8729 | MAE: 0.0071 | Recall@0.5: 0.9523 | HD95@0.5: 16.44px
+Dataset: CVC-CLINICDB    | meanDice: 0.9244 | meanIoU: 0.8762 | S-m: 0.9476 | mean E-m: 0.9722 | max E-m: 0.9788 | max Fm(β²=0.3): 0.9408 | wFm: 0.9222 | MAE: 0.0081 | Recall@0.5: 0.9554 | HD95@0.5: 8.06px
+Dataset: CVC-COLONDB     | meanDice: 0.8053 | meanIoU: 0.7242 | S-m: 0.8698 | mean E-m: 0.9057 | max E-m: 0.9136 | max Fm(β²=0.3): 0.8290 | wFm: 0.7912 | MAE: 0.0294 | Recall@0.5: 0.8276 | HD95@0.5: 49.39px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.8056 | meanIoU: 0.7281 | S-m: 0.8870 | mean E-m: 0.9208 | max E-m: 0.9296 | max Fm(β²=0.3): 0.8208 | wFm: 0.7753 | MAE: 0.0145 | Recall@0.5: 0.8681 | HD95@0.5: 101.20px
+Dataset: KVASIR          | meanDice: 0.9053 | meanIoU: 0.8565 | S-m: 0.9240 | mean E-m: 0.9556 | max E-m: 0.9632 | max Fm(β²=0.3): 0.9249 | wFm: 0.8999 | MAE: 0.0248 | Recall@0.5: 0.9098 | HD95@0.5: 45.66px
+--- R0: released prediction maps, scored on the canonical PraNet estimator ---
+Dataset: CVC-300              | mDice: 0.8926 | mIoU: 0.8255 | S-m: 0.9383 | max E-m: 0.9805 | wFm: 0.8729 | MAE: 0.0071 | Recall@0.5: 0.9523 | HD95@0.5: 16.44px | n=60/60
+Dataset: CVC-CLINICDB         | mDice: 0.9244 | mIoU: 0.8762 | S-m: 0.9476 | max E-m: 0.9788 | wFm: 0.9222 | MAE: 0.0081 | Recall@0.5: 0.9554 | HD95@0.5: 8.06px | n=62/62
+Dataset: CVC-COLONDB          | mDice: 0.8053 | mIoU: 0.7242 | S-m: 0.8698 | max E-m: 0.9136 | wFm: 0.7912 | MAE: 0.0294 | Recall@0.5: 0.8276 | HD95@0.5: 49.39px | n=380/380
+Dataset: ETIS-LARIBPOLYPDB    | mDice: 0.8056 | mIoU: 0.7281 | S-m: 0.8870 | max E-m: 0.9296 | wFm: 0.7753 | MAE: 0.0145 | Recall@0.5: 0.8681 | HD95@0.5: 101.20px | n=196/196
+Dataset: KVASIR               | mDice: 0.9053 | mIoU: 0.8565 | S-m: 0.9240 | max E-m: 0.9632 | wFm: 0.8999 | MAE: 0.0248 | Recall@0.5: 0.9098 | HD95@0.5: 45.66px | n=100/100
+
+ZS-3 mean mDice (CVC-300 / ColonDB / ETIS): 0.8345
+wrote /content/polp_wacv/runs/abl_R0.json
+[config] encoder=pvt_v2_b2 use_fcc_decoder=False fcc_channel=64 fcc_reduce_octave=False fcc_region_calib=False fcc_region_proto=False use_boundary_attn=False use_wavelet_decoder=False use_rfp=False use_mamba_bottleneck=False mamba_bidirectional=False mamba_stage=bottleneck mamba_scan=axial mamba_freq_axis=True freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq edge_stride=8 — pass these flags to match the checkpoint you're profiling.
+Params (M):   31.47
+GMACs:        11.566  [thop, input 352x352, batch=1 — THIS IS THE PAPER NUMBER, same tool every competitor row used]
+FLOPs (G):    23.13  [2 x MACs; do not mix the two conventions in one column]
+FPS:          50.0  [batch=1, input 352x352, 100 reps]
+Peak GPU mem: 3.69 GB  [fwd+bwd, batch=8]
+[params] R0: 31.47 M (no expectation recorded)
+[check] monitor ZS-3 @ep40: 0.8345  |  scored from last.ckpt: 0.8345  |  delta +0.0000
+[disk] pruned 0.70 GB of intermediate checkpoints from WACV_2027_Checkpoints_abl_R0 (last.ckpt kept).
+
+======================================================================
+ARM R0 COMPLETE — 0.83 h training
+  Kvasir               mDice 0.9053
+  CVC-ClinicDB         mDice 0.9244
+  CVC-300              mDice 0.8926
+  CVC-ColonDB          mDice 0.8053
+  ETIS-LaribPolypDB    mDice 0.8056
+  (internal ZS-3)      0.8345  monitor 0.8345
+  params                      : 31.47 M
+  scored from                 : last.ckpt @ epoch 39
+  backed up to Drive          : abl_R0.json, abl_R0_cost.txt, abl_R0_seed0.json, preds_R0.zip
+======================================================================
+
+======================================================================
+[2/4] starting R1 — 3359s into the sweep, Tue 20:17
+======================================================================
+
+######################################################################
+# ARM R1 — + frequency-decomposed octave decoder and the tri-axial mixer at f0/f1
+#   flags  : --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+#   backup : /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R1
+#   log    : /content/drive/MyDrive/abl_R1_log.txt
+######################################################################
+
+[setup] FRESH start — no existing backup
+[setup] cleared /content/polp_wacv/lightning_logs (the launcher restores this arm's own copy if any)
+======================================================================
+PRE-FLIGHT R1 (--dry-run): full env/dataset/mamba audit, no training.
+======================================================================
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R1 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R1_seed0.json --no-fcc-region-calib --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R1_seed0.json --no-fcc-region-calib --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] --dry-run set, exiting without launching training.
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R1/runs
+Checkpoint backup complete (runs: 5 copied, 0 unchanged).
+
+======================================================================
+PRE-FLIGHT PASSED in 0.2 min. 24 flags present, 12 absent.
+LAUNCHING R1 — 40 epochs, code @ b8ed1e28. Log: /content/drive/MyDrive/abl_R1_log.txt
+======================================================================
+
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R1 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R1_seed0.json --no-fcc-region-calib --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.0 --contrast-weight 0.0 --fcc-channel 64 --edge-stride 8 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R1_seed0.json --no-fcc-region-calib --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+Seed set to 0
+[precision] lightning=bf16-mixed float32_matmul=medium
+[run-config] model=ours encoder=pvt_v2_b2 recipe=ours seed=0 epochs=40 bs=16 accum=1 lr=0.0001 wd=0.0001 aug=light hat_prob=0.0 fda=0.0@beta0.01 val_fraction=0.0 split_seed=0 lr_schedule=cosine warmup=5 restart_cycle_len=20 encoder_lr_scale=1.0 clip=value@0.5 multi_scale=True step_per_scale=True use_fcc_decoder=True fcc_region_calib=False fcc_edge_weight=3.0 fcc_share_bn=False fcc_channel=64 fcc_reduce_octave=False bce_unweighted=True iou_smooth=1.0 ms_mask_interp=bilinear img_size=352 fullres_head=False select_on_test=False select_on=indomain select_weights=raw use_rfp=False edge_stride=8 mamba_stage=h4h8 mamba_scan=raster mamba_freq_axis=True mamba_ls_init=0.0001 freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq fcc_region_proto=False ema_decay=0.0 precision=bf16-mixed matmul_precision=medium use_mamba_bottleneck=True ds_mutation=False mamba_bidirectional=True tversky=0.0@(0.7,0.3) boundary_dice=0.0 contrast_weight=0.0
+
+[check] [run-config] matches all 29 required settings for R1.
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[params] total=34.766 M encoder=24.850 M fcc_decoder=8.958 M
+WARNING: --val-fraction 0 - no held-out split, so there is no blind selection signal. Report 'last', or pass --select-on-test to reproduce the published max-over-epochs-on-test rule and label the number accordingly.
+Using bfloat16 Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+--fresh: no lightning_logs/ found, already clean.
+⏬ Loading WACV Benchmark Train Dataset from /content/TrainDataset (aug=light, hat_prob=0.0, img_size=352)...
+✅ Loaded 1450 train / 0 val images (val_fraction=0.0, split seed=0)
+   effective train images/epoch: 1440 of 1450 (0 held out, 10 dropped by drop_last at batch_size=16)
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/model_summary/model_summary.py:242: Precision bf16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
+┏━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name  ┃ Type            ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model │ SpectraMambaNet │ 34.8 M │ train │     0 │
+└───┴───────┴─────────────────┴────────┴───────┴───────┘
+Trainable params: 34.8 M                                                        
+Non-trainable params: 0                                                         
+Total params: 34.8 M                                                            
+Total estimated model params size (MB): 139.064                                 
+Modules in train mode: 729                                                      
+Modules in eval mode: 0                                                         
+Total FLOPs: 0                                                                  
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 000/40 | Train Loss: 6.0241 | Val Dice: N/A
+  [tel] edge_mean=3.616e-01  h4_delta_mag=9.975e-04  h4_delta_sat=0.000e+00  h4_ls_f=6.692e-04  h4_ls_h=7.709e-04  h4_ls_w=7.422e-04  h8_delta_mag=8.378e-04  h8_delta_sat=0.000e+00  h8_ls_f=5.602e-04  h8_ls_h=5.534e-04  h8_ls_w=6.347e-04
+Epoch 001/40 | Train Loss: 4.8129 | Val Dice: N/A
+
+[eta] 2.1 min/epoch measured. This arm: 38 epochs left -> ~1.4 h, done around 21:49. Whole sweep (2 more arms after this one): ~4.2 h -> Wed 00:41.
+
+  [tel] edge_mean=2.735e-01  h4_delta_mag=3.911e-03  h4_delta_sat=0.000e+00  h4_ls_f=1.839e-03  h4_ls_h=2.189e-03  h4_ls_w=2.147e-03  h8_delta_mag=3.407e-03  h8_delta_sat=0.000e+00  h8_ls_f=1.690e-03  h8_ls_h=2.364e-03  h8_ls_w=3.004e-03
+Epoch 002/40 | Train Loss: 4.0729 | Val Dice: N/A
+  [tel] edge_mean=2.165e-01  h4_delta_mag=1.102e-02  h4_delta_sat=0.000e+00  h4_ls_f=3.439e-03  h4_ls_h=6.410e-03  h4_ls_w=5.677e-03  h8_delta_mag=1.304e-02  h8_delta_sat=0.000e+00  h8_ls_f=3.044e-03  h8_ls_h=5.929e-03  h8_ls_w=5.880e-03
+Epoch 003/40 | Train Loss: 3.3556 | Val Dice: N/A
+  [tel] edge_mean=1.657e-01  h4_delta_mag=5.349e-02  h4_delta_sat=0.000e+00  h4_ls_f=5.635e-03  h4_ls_h=1.059e-02  h4_ls_w=1.137e-02  h8_delta_mag=1.783e-01  h8_delta_sat=2.439e-07  h8_ls_f=4.794e-03  h8_ls_h=9.562e-03  h8_ls_w=7.164e-03
+Epoch 004/40 | Train Loss: 2.7448 | Val Dice: N/A
+  [tel] edge_mean=1.240e-01  h4_delta_mag=1.248e-01  h4_delta_sat=0.000e+00  h4_ls_f=8.138e-03  h4_ls_h=1.323e-02  h4_ls_w=1.627e-02  h8_delta_mag=4.967e-01  h8_delta_sat=2.394e-03  h8_ls_f=6.920e-03  h8_ls_h=1.214e-02  h8_ls_w=8.756e-03
+Epoch 005/40 | Train Loss: 2.2039 | Val Dice: N/A
+  [tel] edge_mean=9.436e-02  h4_delta_mag=1.797e-01  h4_delta_sat=6.799e-09  h4_ls_f=1.017e-02  h4_ls_h=1.514e-02  h4_ls_w=1.943e-02  h8_delta_mag=9.150e-01  h8_delta_sat=2.349e-02  h8_ls_f=8.763e-03  h8_ls_h=1.347e-02  h8_ls_w=1.023e-02
+Epoch 006/40 | Train Loss: 1.8777 | Val Dice: N/A
+  [tel] edge_mean=7.676e-02  h4_delta_mag=1.952e-01  h4_delta_sat=0.000e+00  h4_ls_f=1.181e-02  h4_ls_h=1.631e-02  h4_ls_w=2.239e-02  h8_delta_mag=9.738e-01  h8_delta_sat=3.524e-02  h8_ls_f=1.052e-02  h8_ls_h=1.435e-02  h8_ls_w=1.143e-02
+Epoch 007/40 | Train Loss: 1.6022 | Val Dice: N/A
+  [tel] edge_mean=6.545e-02  h4_delta_mag=2.654e-01  h4_delta_sat=3.399e-08  h4_ls_f=1.323e-02  h4_ls_h=1.686e-02  h4_ls_w=2.464e-02  h8_delta_mag=7.337e-01  h8_delta_sat=1.132e-02  h8_ls_f=1.246e-02  h8_ls_h=1.532e-02  h8_ls_w=1.223e-02
+Epoch 008/40 | Train Loss: 1.4421 | Val Dice: N/A
+  [tel] edge_mean=5.757e-02  h4_delta_mag=3.613e-01  h4_delta_sat=6.544e-06  h4_ls_f=1.461e-02  h4_ls_h=1.745e-02  h4_ls_w=2.646e-02  h8_delta_mag=9.698e-01  h8_delta_sat=4.812e-02  h8_ls_f=1.411e-02  h8_ls_h=1.592e-02  h8_ls_w=1.286e-02
+Epoch 009/40 | Train Loss: 1.2925 | Val Dice: N/A
+  [tel] edge_mean=5.193e-02  h4_delta_mag=4.565e-01  h4_delta_sat=4.555e-04  h4_ls_f=1.578e-02  h4_ls_h=1.820e-02  h4_ls_w=2.780e-02  h8_delta_mag=7.275e-01  h8_delta_sat=2.265e-02  h8_ls_f=1.588e-02  h8_ls_h=1.621e-02  h8_ls_w=1.345e-02
+Epoch 010/40 | Train Loss: 1.2481 | Val Dice: N/A
+  [tel] edge_mean=4.753e-02  h4_delta_mag=4.211e-01  h4_delta_sat=1.871e-04  h4_ls_f=1.694e-02  h4_ls_h=1.863e-02  h4_ls_w=2.858e-02  h8_delta_mag=6.834e-01  h8_delta_sat=2.205e-02  h8_ls_f=1.746e-02  h8_ls_h=1.653e-02  h8_ls_w=1.396e-02
+Epoch 011/40 | Train Loss: 1.1339 | Val Dice: N/A
+  [tel] edge_mean=4.377e-02  h4_delta_mag=4.532e-01  h4_delta_sat=1.068e-03  h4_ls_f=1.800e-02  h4_ls_h=1.882e-02  h4_ls_w=2.953e-02  h8_delta_mag=6.667e-01  h8_delta_sat=1.709e-02  h8_ls_f=1.924e-02  h8_ls_h=1.716e-02  h8_ls_w=1.442e-02
+Epoch 012/40 | Train Loss: 1.0627 | Val Dice: N/A
+  [tel] edge_mean=4.135e-02  h4_delta_mag=5.039e-01  h4_delta_sat=2.972e-03  h4_ls_f=1.872e-02  h4_ls_h=1.933e-02  h4_ls_w=3.035e-02  h8_delta_mag=6.917e-01  h8_delta_sat=2.122e-02  h8_ls_f=1.975e-02  h8_ls_h=1.752e-02  h8_ls_w=1.478e-02
+Epoch 013/40 | Train Loss: 1.0223 | Val Dice: N/A
+  [tel] edge_mean=3.981e-02  h4_delta_mag=5.860e-01  h4_delta_sat=6.117e-03  h4_ls_f=1.958e-02  h4_ls_h=1.950e-02  h4_ls_w=3.080e-02  h8_delta_mag=6.638e-01  h8_delta_sat=1.861e-02  h8_ls_f=2.047e-02  h8_ls_h=1.781e-02  h8_ls_w=1.506e-02
+Epoch 014/40 | Train Loss: 0.9691 | Val Dice: N/A
+  [tel] edge_mean=3.848e-02  h4_delta_mag=5.720e-01  h4_delta_sat=6.878e-03  h4_ls_f=2.009e-02  h4_ls_h=1.992e-02  h4_ls_w=3.111e-02  h8_delta_mag=5.588e-01  h8_delta_sat=1.172e-02  h8_ls_f=2.172e-02  h8_ls_h=1.799e-02  h8_ls_w=1.556e-02
+Epoch 015/40 | Train Loss: 0.9284 | Val Dice: N/A
+  [tel] edge_mean=3.754e-02  h4_delta_mag=5.120e-01  h4_delta_sat=3.735e-03  h4_ls_f=2.034e-02  h4_ls_h=1.990e-02  h4_ls_w=3.149e-02  h8_delta_mag=5.368e-01  h8_delta_sat=1.063e-02  h8_ls_f=2.239e-02  h8_ls_h=1.829e-02  h8_ls_w=1.601e-02
+Epoch 016/40 | Train Loss: 0.9251 | Val Dice: N/A
+  [tel] edge_mean=3.671e-02  h4_delta_mag=4.731e-01  h4_delta_sat=2.209e-03  h4_ls_f=2.120e-02  h4_ls_h=2.022e-02  h4_ls_w=3.173e-02  h8_delta_mag=7.272e-01  h8_delta_sat=2.968e-02  h8_ls_f=2.302e-02  h8_ls_h=1.845e-02  h8_ls_w=1.634e-02
+Epoch 017/40 | Train Loss: 0.8419 | Val Dice: N/A
+  [tel] edge_mean=3.643e-02  h4_delta_mag=5.022e-01  h4_delta_sat=3.080e-03  h4_ls_f=2.175e-02  h4_ls_h=2.062e-02  h4_ls_w=3.191e-02  h8_delta_mag=7.023e-01  h8_delta_sat=2.406e-02  h8_ls_f=2.365e-02  h8_ls_h=1.861e-02  h8_ls_w=1.657e-02
+Epoch 018/40 | Train Loss: 0.8415 | Val Dice: N/A
+  [tel] edge_mean=3.591e-02  h4_delta_mag=5.024e-01  h4_delta_sat=3.023e-03  h4_ls_f=2.209e-02  h4_ls_h=2.093e-02  h4_ls_w=3.211e-02  h8_delta_mag=6.423e-01  h8_delta_sat=1.965e-02  h8_ls_f=2.462e-02  h8_ls_h=1.884e-02  h8_ls_w=1.682e-02
+Epoch 019/40 | Train Loss: 0.8047 | Val Dice: N/A
+  [tel] edge_mean=3.554e-02  h4_delta_mag=4.502e-01  h4_delta_sat=1.325e-03  h4_ls_f=2.237e-02  h4_ls_h=2.093e-02  h4_ls_w=3.218e-02  h8_delta_mag=5.726e-01  h8_delta_sat=1.456e-02  h8_ls_f=2.586e-02  h8_ls_h=1.895e-02  h8_ls_w=1.707e-02
+
+--- Zero-shot MONITORING at epoch 20 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8610 | meanIoU: 0.7944 | S-m: 0.9206 | mean E-m: 0.9345 | max E-m: 0.9555 | max Fm(β²=0.3): 0.8874 | wFm: 0.8404 | MAE: 0.0118 | Recall@0.5: 0.9496 | HD95@0.5: 33.08px
+Dataset: CVC-CLINICDB    | meanDice: 0.9138 | meanIoU: 0.8654 | S-m: 0.9467 | mean E-m: 0.9648 | max E-m: 0.9714 | max Fm(β²=0.3): 0.9329 | wFm: 0.9112 | MAE: 0.0079 | Recall@0.5: 0.9469 | HD95@0.5: 10.34px
+Dataset: CVC-COLONDB     | meanDice: 0.7759 | meanIoU: 0.6974 | S-m: 0.8535 | mean E-m: 0.8831 | max E-m: 0.8904 | max Fm(β²=0.3): 0.8035 | wFm: 0.7580 | MAE: 0.0356 | Recall@0.5: 0.8210 | HD95@0.5: 61.28px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7964 | meanIoU: 0.7157 | S-m: 0.8869 | mean E-m: 0.9047 | max E-m: 0.9221 | max Fm(β²=0.3): 0.8145 | wFm: 0.7575 | MAE: 0.0135 | Recall@0.5: 0.8962 | HD95@0.5: 137.82px
+Dataset: KVASIR          | meanDice: 0.9149 | meanIoU: 0.8638 | S-m: 0.9313 | mean E-m: 0.9550 | max E-m: 0.9629 | max Fm(β²=0.3): 0.9393 | wFm: 0.9091 | MAE: 0.0236 | Recall@0.5: 0.9180 | HD95@0.5: 42.45px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8111  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8524 ---
+Epoch 020/40 | Train Loss: 0.7599 | Val Dice: N/A
+  [tel] edge_mean=3.536e-02  h4_delta_mag=4.439e-01  h4_delta_sat=1.093e-03  h4_ls_f=2.251e-02  h4_ls_h=2.098e-02  h4_ls_w=3.240e-02  h8_delta_mag=6.131e-01  h8_delta_sat=1.653e-02  h8_ls_f=2.637e-02  h8_ls_h=1.912e-02  h8_ls_w=1.721e-02
+Epoch 021/40 | Train Loss: 0.7901 | Val Dice: N/A
+  [tel] edge_mean=3.518e-02  h4_delta_mag=4.210e-01  h4_delta_sat=8.048e-04  h4_ls_f=2.271e-02  h4_ls_h=2.121e-02  h4_ls_w=3.266e-02  h8_delta_mag=5.933e-01  h8_delta_sat=1.619e-02  h8_ls_f=2.745e-02  h8_ls_h=1.928e-02  h8_ls_w=1.746e-02
+Epoch 022/40 | Train Loss: 0.7744 | Val Dice: N/A
+  [tel] edge_mean=3.523e-02  h4_delta_mag=4.177e-01  h4_delta_sat=7.663e-04  h4_ls_f=2.304e-02  h4_ls_h=2.144e-02  h4_ls_w=3.258e-02  h8_delta_mag=6.669e-01  h8_delta_sat=2.193e-02  h8_ls_f=2.812e-02  h8_ls_h=1.938e-02  h8_ls_w=1.768e-02
+Epoch 023/40 | Train Loss: 0.7411 | Val Dice: N/A
+  [tel] edge_mean=3.491e-02  h4_delta_mag=4.105e-01  h4_delta_sat=7.162e-04  h4_ls_f=2.326e-02  h4_ls_h=2.167e-02  h4_ls_w=3.270e-02  h8_delta_mag=5.648e-01  h8_delta_sat=1.273e-02  h8_ls_f=2.852e-02  h8_ls_h=1.960e-02  h8_ls_w=1.781e-02
+Epoch 024/40 | Train Loss: 0.7038 | Val Dice: N/A
+  [tel] edge_mean=3.476e-02  h4_delta_mag=3.845e-01  h4_delta_sat=3.947e-04  h4_ls_f=2.337e-02  h4_ls_h=2.188e-02  h4_ls_w=3.284e-02  h8_delta_mag=5.507e-01  h8_delta_sat=1.226e-02  h8_ls_f=2.945e-02  h8_ls_h=1.973e-02  h8_ls_w=1.797e-02
+Epoch 025/40 | Train Loss: 0.6886 | Val Dice: N/A
+  [tel] edge_mean=3.478e-02  h4_delta_mag=3.776e-01  h4_delta_sat=4.156e-04  h4_ls_f=2.347e-02  h4_ls_h=2.204e-02  h4_ls_w=3.285e-02  h8_delta_mag=4.385e-01  h8_delta_sat=6.079e-03  h8_ls_f=3.011e-02  h8_ls_h=1.986e-02  h8_ls_w=1.811e-02
+Epoch 026/40 | Train Loss: 0.6803 | Val Dice: N/A
+  [tel] edge_mean=3.481e-02  h4_delta_mag=3.910e-01  h4_delta_sat=4.859e-04  h4_ls_f=2.357e-02  h4_ls_h=2.201e-02  h4_ls_w=3.297e-02  h8_delta_mag=5.023e-01  h8_delta_sat=9.884e-03  h8_ls_f=3.050e-02  h8_ls_h=2.000e-02  h8_ls_w=1.820e-02
+Epoch 027/40 | Train Loss: 0.6627 | Val Dice: N/A
+  [tel] edge_mean=3.459e-02  h4_delta_mag=4.031e-01  h4_delta_sat=6.457e-04  h4_ls_f=2.365e-02  h4_ls_h=2.202e-02  h4_ls_w=3.308e-02  h8_delta_mag=5.280e-01  h8_delta_sat=9.672e-03  h8_ls_f=3.128e-02  h8_ls_h=2.011e-02  h8_ls_w=1.831e-02
+Epoch 028/40 | Train Loss: 0.6518 | Val Dice: N/A
+  [tel] edge_mean=3.462e-02  h4_delta_mag=3.981e-01  h4_delta_sat=6.055e-04  h4_ls_f=2.385e-02  h4_ls_h=2.209e-02  h4_ls_w=3.306e-02  h8_delta_mag=5.359e-01  h8_delta_sat=1.081e-02  h8_ls_f=3.202e-02  h8_ls_h=2.013e-02  h8_ls_w=1.835e-02
+Epoch 029/40 | Train Loss: 0.6456 | Val Dice: N/A
+  [tel] edge_mean=3.448e-02  h4_delta_mag=4.010e-01  h4_delta_sat=6.008e-04  h4_ls_f=2.383e-02  h4_ls_h=2.214e-02  h4_ls_w=3.316e-02  h8_delta_mag=5.505e-01  h8_delta_sat=1.171e-02  h8_ls_f=3.271e-02  h8_ls_h=2.022e-02  h8_ls_w=1.841e-02
+Epoch 030/40 | Train Loss: 0.6356 | Val Dice: N/A
+  [tel] edge_mean=3.452e-02  h4_delta_mag=4.062e-01  h4_delta_sat=6.752e-04  h4_ls_f=2.393e-02  h4_ls_h=2.222e-02  h4_ls_w=3.321e-02  h8_delta_mag=5.558e-01  h8_delta_sat=1.273e-02  h8_ls_f=3.327e-02  h8_ls_h=2.030e-02  h8_ls_w=1.846e-02
+Epoch 031/40 | Train Loss: 0.6303 | Val Dice: N/A
+  [tel] edge_mean=3.460e-02  h4_delta_mag=4.126e-01  h4_delta_sat=7.627e-04  h4_ls_f=2.402e-02  h4_ls_h=2.226e-02  h4_ls_w=3.325e-02  h8_delta_mag=5.777e-01  h8_delta_sat=1.331e-02  h8_ls_f=3.373e-02  h8_ls_h=2.034e-02  h8_ls_w=1.851e-02
+Epoch 032/40 | Train Loss: 0.6220 | Val Dice: N/A
+  [tel] edge_mean=3.450e-02  h4_delta_mag=4.026e-01  h4_delta_sat=6.567e-04  h4_ls_f=2.407e-02  h4_ls_h=2.228e-02  h4_ls_w=3.329e-02  h8_delta_mag=5.622e-01  h8_delta_sat=1.186e-02  h8_ls_f=3.404e-02  h8_ls_h=2.037e-02  h8_ls_w=1.849e-02
+Epoch 033/40 | Train Loss: 0.6084 | Val Dice: N/A
+  [tel] edge_mean=3.447e-02  h4_delta_mag=3.959e-01  h4_delta_sat=6.237e-04  h4_ls_f=2.407e-02  h4_ls_h=2.229e-02  h4_ls_w=3.329e-02  h8_delta_mag=5.829e-01  h8_delta_sat=1.327e-02  h8_ls_f=3.434e-02  h8_ls_h=2.035e-02  h8_ls_w=1.852e-02
+Epoch 034/40 | Train Loss: 0.6085 | Val Dice: N/A
+  [tel] edge_mean=3.454e-02  h4_delta_mag=3.948e-01  h4_delta_sat=6.318e-04  h4_ls_f=2.407e-02  h4_ls_h=2.228e-02  h4_ls_w=3.332e-02  h8_delta_mag=5.900e-01  h8_delta_sat=1.392e-02  h8_ls_f=3.471e-02  h8_ls_h=2.038e-02  h8_ls_w=1.855e-02
+Epoch 035/40 | Train Loss: 0.6024 | Val Dice: N/A
+  [tel] edge_mean=3.455e-02  h4_delta_mag=3.972e-01  h4_delta_sat=6.662e-04  h4_ls_f=2.411e-02  h4_ls_h=2.228e-02  h4_ls_w=3.333e-02  h8_delta_mag=5.992e-01  h8_delta_sat=1.420e-02  h8_ls_f=3.491e-02  h8_ls_h=2.039e-02  h8_ls_w=1.857e-02
+Epoch 036/40 | Train Loss: 0.6032 | Val Dice: N/A
+  [tel] edge_mean=3.449e-02  h4_delta_mag=3.916e-01  h4_delta_sat=5.852e-04  h4_ls_f=2.412e-02  h4_ls_h=2.230e-02  h4_ls_w=3.333e-02  h8_delta_mag=6.179e-01  h8_delta_sat=1.557e-02  h8_ls_f=3.505e-02  h8_ls_h=2.039e-02  h8_ls_w=1.857e-02
+Epoch 037/40 | Train Loss: 0.5932 | Val Dice: N/A
+  [tel] edge_mean=3.453e-02  h4_delta_mag=3.917e-01  h4_delta_sat=5.934e-04  h4_ls_f=2.414e-02  h4_ls_h=2.232e-02  h4_ls_w=3.333e-02  h8_delta_mag=6.369e-01  h8_delta_sat=1.676e-02  h8_ls_f=3.515e-02  h8_ls_h=2.041e-02  h8_ls_w=1.858e-02
+Epoch 038/40 | Train Loss: 0.5985 | Val Dice: N/A
+  [tel] edge_mean=3.450e-02  h4_delta_mag=3.927e-01  h4_delta_sat=6.122e-04  h4_ls_f=2.415e-02  h4_ls_h=2.232e-02  h4_ls_w=3.335e-02  h8_delta_mag=6.455e-01  h8_delta_sat=1.729e-02  h8_ls_f=3.523e-02  h8_ls_h=2.041e-02  h8_ls_w=1.858e-02
+Epoch 039/40 | Train Loss: 0.5842 | Val Dice: N/A
+  [tel] edge_mean=3.450e-02  h4_delta_mag=3.924e-01  h4_delta_sat=6.144e-04  h4_ls_f=2.416e-02  h4_ls_h=2.232e-02  h4_ls_w=3.335e-02  h8_delta_mag=6.420e-01  h8_delta_sat=1.669e-02  h8_ls_f=3.527e-02  h8_ls_h=2.041e-02  h8_ls_w=1.858e-02
+
+--- Zero-shot MONITORING at epoch 40 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8896 | meanIoU: 0.8248 | S-m: 0.9344 | mean E-m: 0.9593 | max E-m: 0.9726 | max Fm(β²=0.3): 0.9065 | wFm: 0.8729 | MAE: 0.0072 | Recall@0.5: 0.9493 | HD95@0.5: 21.29px
+Dataset: CVC-CLINICDB    | meanDice: 0.9139 | meanIoU: 0.8688 | S-m: 0.9431 | mean E-m: 0.9624 | max E-m: 0.9685 | max Fm(β²=0.3): 0.9283 | wFm: 0.9124 | MAE: 0.0105 | Recall@0.5: 0.9576 | HD95@0.5: 12.34px
+Dataset: CVC-COLONDB     | meanDice: 0.7974 | meanIoU: 0.7180 | S-m: 0.8624 | mean E-m: 0.8975 | max E-m: 0.9022 | max Fm(β²=0.3): 0.8241 | wFm: 0.7820 | MAE: 0.0319 | Recall@0.5: 0.8285 | HD95@0.5: 53.35px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7996 | meanIoU: 0.7192 | S-m: 0.8819 | mean E-m: 0.9035 | max E-m: 0.9213 | max Fm(β²=0.3): 0.8240 | wFm: 0.7585 | MAE: 0.0173 | Recall@0.5: 0.9075 | HD95@0.5: 133.96px
+Dataset: KVASIR          | meanDice: 0.9150 | meanIoU: 0.8633 | S-m: 0.9271 | mean E-m: 0.9558 | max E-m: 0.9621 | max Fm(β²=0.3): 0.9330 | wFm: 0.9067 | MAE: 0.0238 | Recall@0.5: 0.9250 | HD95@0.5: 42.50px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8289  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8631 ---
+`Trainer.fit` stopped: `max_epochs=40` reached.
+
+Saving lightning_logs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R1/lightning_logs
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R1/runs
+Checkpoint backup complete (lightning_logs: 3 copied, 2 unchanged; runs: 1 copied, 5 unchanged).
+
+[train] exit 0 after 1.64 h. Log at /content/drive/MyDrive/abl_R1_log.txt
+
+======================================================================
+SCORING R1 on last.ckpt
+======================================================================
+[score] checkpoint: /content/polp_wacv/lightning_logs/version_0/checkpoints/last.ckpt
+[score] epoch=39 mamba_freq_axis=True use_mamba_bottleneck=True mamba_stage=h4h8 mamba_scan=raster
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8896 | meanIoU: 0.8248 | S-m: 0.9344 | mean E-m: 0.9593 | max E-m: 0.9726 | max Fm(β²=0.3): 0.9065 | wFm: 0.8729 | MAE: 0.0072 | Recall@0.5: 0.9493 | HD95@0.5: 21.29px
+Dataset: CVC-CLINICDB    | meanDice: 0.9139 | meanIoU: 0.8688 | S-m: 0.9431 | mean E-m: 0.9624 | max E-m: 0.9685 | max Fm(β²=0.3): 0.9283 | wFm: 0.9124 | MAE: 0.0105 | Recall@0.5: 0.9576 | HD95@0.5: 12.35px
+Dataset: CVC-COLONDB     | meanDice: 0.7974 | meanIoU: 0.7180 | S-m: 0.8624 | mean E-m: 0.8975 | max E-m: 0.9022 | max Fm(β²=0.3): 0.8240 | wFm: 0.7820 | MAE: 0.0319 | Recall@0.5: 0.8285 | HD95@0.5: 53.35px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7996 | meanIoU: 0.7192 | S-m: 0.8819 | mean E-m: 0.9035 | max E-m: 0.9213 | max Fm(β²=0.3): 0.8241 | wFm: 0.7585 | MAE: 0.0173 | Recall@0.5: 0.9075 | HD95@0.5: 133.97px
+Dataset: KVASIR          | meanDice: 0.9150 | meanIoU: 0.8633 | S-m: 0.9271 | mean E-m: 0.9558 | max E-m: 0.9621 | max Fm(β²=0.3): 0.9330 | wFm: 0.9067 | MAE: 0.0238 | Recall@0.5: 0.9250 | HD95@0.5: 42.49px
+--- R1: released prediction maps, scored on the canonical PraNet estimator ---
+Dataset: CVC-300              | mDice: 0.8896 | mIoU: 0.8248 | S-m: 0.9344 | max E-m: 0.9726 | wFm: 0.8729 | MAE: 0.0072 | Recall@0.5: 0.9493 | HD95@0.5: 21.29px | n=60/60
+Dataset: CVC-CLINICDB         | mDice: 0.9139 | mIoU: 0.8688 | S-m: 0.9431 | max E-m: 0.9685 | wFm: 0.9124 | MAE: 0.0105 | Recall@0.5: 0.9576 | HD95@0.5: 12.35px | n=62/62
+Dataset: CVC-COLONDB          | mDice: 0.7974 | mIoU: 0.7180 | S-m: 0.8624 | max E-m: 0.9022 | wFm: 0.7820 | MAE: 0.0319 | Recall@0.5: 0.8285 | HD95@0.5: 53.35px | n=380/380
+Dataset: ETIS-LARIBPOLYPDB    | mDice: 0.7996 | mIoU: 0.7192 | S-m: 0.8819 | max E-m: 0.9213 | wFm: 0.7585 | MAE: 0.0173 | Recall@0.5: 0.9075 | HD95@0.5: 133.97px | n=196/196
+Dataset: KVASIR               | mDice: 0.9150 | mIoU: 0.8633 | S-m: 0.9271 | max E-m: 0.9621 | wFm: 0.9067 | MAE: 0.0238 | Recall@0.5: 0.9250 | HD95@0.5: 42.49px | n=100/100
+
+ZS-3 mean mDice (CVC-300 / ColonDB / ETIS): 0.8289
+wrote /content/polp_wacv/runs/abl_R1.json
+[config] encoder=pvt_v2_b2 use_fcc_decoder=True fcc_channel=64 fcc_reduce_octave=False fcc_region_calib=False fcc_region_proto=False use_boundary_attn=False use_wavelet_decoder=False use_rfp=False use_mamba_bottleneck=True mamba_bidirectional=True mamba_stage=h4h8 mamba_scan=raster mamba_freq_axis=True freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq edge_stride=8 — pass these flags to match the checkpoint you're profiling.
+Params (M):   34.77
+GMACs:        15.683  [thop, input 352x352, batch=1 — THIS IS THE PAPER NUMBER, same tool every competitor row used]
+FLOPs (G):    31.37  [2 x MACs; do not mix the two conventions in one column]
+FPS:          27.5  [batch=1, input 352x352, 100 reps]
+Peak GPU mem: 5.67 GB  [fwd+bwd, batch=8]
+[params] R1: 34.77 M (no expectation recorded)
+[check] monitor ZS-3 @ep40: 0.8289  |  scored from last.ckpt: 0.8289  |  delta +0.0000
+[disk] pruned 0.78 GB of intermediate checkpoints from WACV_2027_Checkpoints_abl_R1 (last.ckpt kept).
+
+======================================================================
+ARM R1 COMPLETE — 1.64 h training
+  Kvasir               mDice 0.9150
+  CVC-ClinicDB         mDice 0.9139
+  CVC-300              mDice 0.8896
+  CVC-ColonDB          mDice 0.7974
+  ETIS-LaribPolypDB    mDice 0.7996
+  (internal ZS-3)      0.8289  monitor 0.8289
+  params                      : 34.77 M
+  scored from                 : last.ckpt @ epoch 39
+  backed up to Drive          : abl_R1.json, abl_R1_cost.txt, abl_R1_seed0.json, preds_R1.zip
+======================================================================
+
+======================================================================
+[3/4] starting R2 — 9655s into the sweep, Tue 22:02
+======================================================================
+
+######################################################################
+# ARM R2 — + boundary-region calibration, boundary-band Dice, pixel contrast, mutation DS
+#   flags  : --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+#   backup : /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R2
+#   log    : /content/drive/MyDrive/abl_R2_log.txt
+######################################################################
+
+[setup] FRESH start — no existing backup
+[setup] cleared /content/polp_wacv/lightning_logs (the launcher restores this arm's own copy if any)
+======================================================================
+PRE-FLIGHT R2 (--dry-run): full env/dataset/mamba audit, no training.
+======================================================================
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R2 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R2_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R2_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] --dry-run set, exiting without launching training.
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R2/runs
+Checkpoint backup complete (runs: 8 copied, 0 unchanged).
+
+======================================================================
+PRE-FLIGHT PASSED in 0.2 min. 29 flags present, 10 absent.
+LAUNCHING R2 — 40 epochs, code @ b8ed1e28. Log: /content/drive/MyDrive/abl_R2_log.txt
+======================================================================
+
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R2 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R2_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug light --hat-prob 0.0 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R2_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+Seed set to 0
+[precision] lightning=bf16-mixed float32_matmul=medium
+[run-config] model=ours encoder=pvt_v2_b2 recipe=ours seed=0 epochs=40 bs=16 accum=1 lr=0.0001 wd=0.0001 aug=light hat_prob=0.0 fda=0.0@beta0.01 val_fraction=0.0 split_seed=0 lr_schedule=cosine warmup=5 restart_cycle_len=20 encoder_lr_scale=1.0 clip=value@0.5 multi_scale=True step_per_scale=True use_fcc_decoder=True fcc_region_calib=True fcc_edge_weight=3.0 fcc_share_bn=False fcc_channel=64 fcc_reduce_octave=False bce_unweighted=True iou_smooth=1.0 ms_mask_interp=bilinear img_size=352 fullres_head=False select_on_test=False select_on=indomain select_weights=raw use_rfp=False edge_stride=4 mamba_stage=h4h8 mamba_scan=raster mamba_freq_axis=True mamba_ls_init=0.0001 freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq fcc_region_proto=True ema_decay=0.0 precision=bf16-mixed matmul_precision=medium use_mamba_bottleneck=True ds_mutation=True mamba_bidirectional=True tversky=0.0@(0.7,0.3) boundary_dice=0.3 contrast_weight=0.1
+
+[check] [run-config] matches all 25 required settings for R2.
+
+[params] total=35.088 M encoder=24.850 M fcc_decoder=9.046 M
+WARNING: --val-fraction 0 - no held-out split, so there is no blind selection signal. Report 'last', or pass --select-on-test to reproduce the published max-over-epochs-on-test rule and label the number accordingly.
+Using bfloat16 Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+--fresh: no lightning_logs/ found, already clean.
+⏬ Loading WACV Benchmark Train Dataset from /content/TrainDataset (aug=light, hat_prob=0.0, img_size=352)...
+✅ Loaded 1450 train / 0 val images (val_fraction=0.0, split seed=0)
+   effective train images/epoch: 1440 of 1450 (0 held out, 10 dropped by drop_last at batch_size=16)
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/model_summary/model_summary.py:242: Precision bf16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
+┏━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name          ┃ Type              ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model         │ SpectraMambaNet   │ 35.1 M │ train │     0 │
+│ 1 │ contrast_loss │ PixelContrastLoss │      0 │ train │     0 │
+└───┴───────────────┴───────────────────┴────────┴───────┴───────┘
+Trainable params: 35.1 M                                                        
+Non-trainable params: 0                                                         
+Total params: 35.1 M                                                            
+Total estimated model params size (MB): 140.353                                 
+Modules in train mode: 754                                                      
+Modules in eval mode: 0                                                         
+Total FLOPs: 0                                                                  
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 000/40 | Train Loss: 6.6183 | Val Dice: N/A
+  [tel] abs_delta=5.400e-04  band_frac=7.296e-02  edge_mean=3.804e-01  h4_delta_mag=3.110e-03  h4_delta_sat=0.000e+00  h4_ls_f=1.223e-03  h4_ls_h=1.182e-03  h4_ls_w=1.242e-03  h8_delta_mag=7.165e-04  h8_delta_sat=0.000e+00  h8_ls_f=4.689e-04  h8_ls_h=5.023e-04  h8_ls_w=4.831e-04  proto_ctx=1.200e-02
+Epoch 001/40 | Train Loss: 4.9237 | Val Dice: N/A
+
+[eta] 2.5 min/epoch measured. This arm: 38 epochs left -> ~1.6 h, done around 23:49. Whole sweep (1 more arms after this one): ~3.3 h -> Wed 01:30.
+
+  [tel] abs_delta=5.304e-04  band_frac=6.524e-02  edge_mean=2.845e-01  h4_delta_mag=1.065e-01  h4_delta_sat=4.373e-06  h4_ls_f=7.759e-03  h4_ls_h=7.727e-03  h4_ls_w=9.355e-03  h8_delta_mag=3.831e-03  h8_delta_sat=0.000e+00  h8_ls_f=1.422e-03  h8_ls_h=1.545e-03  h8_ls_w=1.395e-03  proto_ctx=1.425e-02
+Epoch 002/40 | Train Loss: 4.0783 | Val Dice: N/A
+  [tel] abs_delta=6.152e-03  band_frac=6.494e-02  edge_mean=2.124e-01  h4_delta_mag=4.136e-01  h4_delta_sat=8.722e-03  h4_ls_f=1.873e-02  h4_ls_h=1.765e-02  h4_ls_w=1.971e-02  h8_delta_mag=5.672e-02  h8_delta_sat=0.000e+00  h8_ls_f=3.255e-03  h8_ls_h=5.300e-03  h8_ls_w=4.669e-03  proto_ctx=5.972e-02
+Epoch 003/40 | Train Loss: 3.5230 | Val Dice: N/A
+  [tel] abs_delta=2.633e-02  band_frac=6.520e-02  edge_mean=1.570e-01  h4_delta_mag=8.892e-01  h4_delta_sat=6.667e-02  h4_ls_f=2.569e-02  h4_ls_h=2.420e-02  h4_ls_w=2.413e-02  h8_delta_mag=1.868e-01  h8_delta_sat=3.575e-07  h8_ls_f=4.858e-03  h8_ls_h=9.123e-03  h8_ls_w=8.935e-03  proto_ctx=1.247e-01
+Epoch 004/40 | Train Loss: 3.1507 | Val Dice: N/A
+  [tel] abs_delta=5.137e-02  band_frac=6.536e-02  edge_mean=1.249e-01  h4_delta_mag=1.012e+00  h4_delta_sat=8.137e-02  h4_ls_f=2.638e-02  h4_ls_h=2.616e-02  h4_ls_w=2.536e-02  h8_delta_mag=3.933e-01  h8_delta_sat=7.005e-04  h8_ls_f=5.935e-03  h8_ls_h=1.041e-02  h8_ls_w=1.121e-02  proto_ctx=1.196e-01
+Epoch 005/40 | Train Loss: 2.7700 | Val Dice: N/A
+  [tel] abs_delta=6.294e-02  band_frac=6.363e-02  edge_mean=1.006e-01  h4_delta_mag=9.967e-01  h4_delta_sat=7.820e-02  h4_ls_f=2.667e-02  h4_ls_h=2.688e-02  h4_ls_w=2.657e-02  h8_delta_mag=6.522e-01  h8_delta_sat=8.266e-03  h8_ls_f=6.873e-03  h8_ls_h=1.110e-02  h8_ls_w=1.226e-02  proto_ctx=9.063e-02
+Epoch 006/40 | Train Loss: 2.5791 | Val Dice: N/A
+  [tel] abs_delta=7.503e-02  band_frac=6.488e-02  edge_mean=8.600e-02  h4_delta_mag=1.437e+00  h4_delta_sat=1.560e-01  h4_ls_f=2.699e-02  h4_ls_h=2.733e-02  h4_ls_w=2.745e-02  h8_delta_mag=6.951e-01  h8_delta_sat=1.506e-02  h8_ls_f=8.134e-03  h8_ls_h=1.179e-02  h8_ls_w=1.302e-02  proto_ctx=1.368e-01
+Epoch 007/40 | Train Loss: 2.3921 | Val Dice: N/A
+  [tel] abs_delta=8.211e-02  band_frac=6.475e-02  edge_mean=7.572e-02  h4_delta_mag=1.282e+00  h4_delta_sat=1.273e-01  h4_ls_f=2.715e-02  h4_ls_h=2.764e-02  h4_ls_w=2.844e-02  h8_delta_mag=8.624e-01  h8_delta_sat=4.092e-02  h8_ls_f=9.281e-03  h8_ls_h=1.218e-02  h8_ls_w=1.374e-02  proto_ctx=1.696e-01
+Epoch 008/40 | Train Loss: 2.2991 | Val Dice: N/A
+  [tel] abs_delta=8.807e-02  band_frac=6.389e-02  edge_mean=6.785e-02  h4_delta_mag=1.211e+00  h4_delta_sat=1.112e-01  h4_ls_f=2.735e-02  h4_ls_h=2.788e-02  h4_ls_w=2.902e-02  h8_delta_mag=6.833e-01  h8_delta_sat=2.004e-02  h8_ls_f=1.045e-02  h8_ls_h=1.270e-02  h8_ls_w=1.465e-02  proto_ctx=2.025e-01
+Epoch 009/40 | Train Loss: 2.1975 | Val Dice: N/A
+  [tel] abs_delta=8.549e-02  band_frac=6.383e-02  edge_mean=6.129e-02  h4_delta_mag=1.344e+00  h4_delta_sat=1.388e-01  h4_ls_f=2.763e-02  h4_ls_h=2.816e-02  h4_ls_w=2.956e-02  h8_delta_mag=8.921e-01  h8_delta_sat=5.026e-02  h8_ls_f=1.149e-02  h8_ls_h=1.306e-02  h8_ls_w=1.547e-02  proto_ctx=2.430e-01
+Epoch 010/40 | Train Loss: 2.1104 | Val Dice: N/A
+  [tel] abs_delta=8.681e-02  band_frac=6.415e-02  edge_mean=5.697e-02  h4_delta_mag=1.665e+00  h4_delta_sat=1.933e-01  h4_ls_f=2.798e-02  h4_ls_h=2.829e-02  h4_ls_w=3.001e-02  h8_delta_mag=7.949e-01  h8_delta_sat=3.799e-02  h8_ls_f=1.273e-02  h8_ls_h=1.349e-02  h8_ls_w=1.627e-02  proto_ctx=3.013e-01
+Epoch 011/40 | Train Loss: 2.0454 | Val Dice: N/A
+  [tel] abs_delta=8.375e-02  band_frac=6.405e-02  edge_mean=5.306e-02  h4_delta_mag=1.687e+00  h4_delta_sat=2.016e-01  h4_ls_f=2.806e-02  h4_ls_h=2.846e-02  h4_ls_w=3.061e-02  h8_delta_mag=6.287e-01  h8_delta_sat=2.331e-02  h8_ls_f=1.401e-02  h8_ls_h=1.396e-02  h8_ls_w=1.680e-02  proto_ctx=3.433e-01
+Epoch 012/40 | Train Loss: 1.9128 | Val Dice: N/A
+  [tel] abs_delta=9.579e-02  band_frac=6.244e-02  edge_mean=5.161e-02  h4_delta_mag=1.288e+00  h4_delta_sat=1.342e-01  h4_ls_f=2.827e-02  h4_ls_h=2.872e-02  h4_ls_w=3.075e-02  h8_delta_mag=9.203e-01  h8_delta_sat=6.450e-02  h8_ls_f=1.520e-02  h8_ls_h=1.423e-02  h8_ls_w=1.734e-02  proto_ctx=3.475e-01
+Epoch 013/40 | Train Loss: 1.8428 | Val Dice: N/A
+  [tel] abs_delta=9.684e-02  band_frac=6.198e-02  edge_mean=4.968e-02  h4_delta_mag=1.411e+00  h4_delta_sat=1.538e-01  h4_ls_f=2.841e-02  h4_ls_h=2.883e-02  h4_ls_w=3.081e-02  h8_delta_mag=7.705e-01  h8_delta_sat=4.271e-02  h8_ls_f=1.625e-02  h8_ls_h=1.444e-02  h8_ls_w=1.762e-02  proto_ctx=3.952e-01
+Epoch 014/40 | Train Loss: 1.8046 | Val Dice: N/A
+  [tel] abs_delta=8.943e-02  band_frac=6.195e-02  edge_mean=4.728e-02  h4_delta_mag=1.585e+00  h4_delta_sat=1.823e-01  h4_ls_f=2.845e-02  h4_ls_h=2.902e-02  h4_ls_w=3.102e-02  h8_delta_mag=7.191e-01  h8_delta_sat=3.801e-02  h8_ls_f=1.725e-02  h8_ls_h=1.462e-02  h8_ls_w=1.805e-02  proto_ctx=4.186e-01
+Epoch 015/40 | Train Loss: 1.8811 | Val Dice: N/A
+  [tel] abs_delta=9.959e-02  band_frac=6.481e-02  edge_mean=4.731e-02  h4_delta_mag=1.755e+00  h4_delta_sat=2.056e-01  h4_ls_f=2.862e-02  h4_ls_h=2.927e-02  h4_ls_w=3.133e-02  h8_delta_mag=6.982e-01  h8_delta_sat=3.762e-02  h8_ls_f=1.805e-02  h8_ls_h=1.499e-02  h8_ls_w=1.840e-02  proto_ctx=4.140e-01
+Epoch 016/40 | Train Loss: 1.7523 | Val Dice: N/A
+  [tel] abs_delta=9.892e-02  band_frac=6.228e-02  edge_mean=4.600e-02  h4_delta_mag=1.957e+00  h4_delta_sat=2.341e-01  h4_ls_f=2.871e-02  h4_ls_h=2.952e-02  h4_ls_w=3.168e-02  h8_delta_mag=6.555e-01  h8_delta_sat=3.366e-02  h8_ls_f=1.896e-02  h8_ls_h=1.522e-02  h8_ls_w=1.875e-02  proto_ctx=4.252e-01
+Epoch 017/40 | Train Loss: 1.6543 | Val Dice: N/A
+  [tel] abs_delta=9.375e-02  band_frac=6.105e-02  edge_mean=4.427e-02  h4_delta_mag=1.872e+00  h4_delta_sat=2.236e-01  h4_ls_f=2.880e-02  h4_ls_h=2.963e-02  h4_ls_w=3.156e-02  h8_delta_mag=5.567e-01  h8_delta_sat=2.374e-02  h8_ls_f=1.968e-02  h8_ls_h=1.544e-02  h8_ls_w=1.903e-02  proto_ctx=4.559e-01
+Epoch 018/40 | Train Loss: 1.6445 | Val Dice: N/A
+  [tel] abs_delta=8.601e-02  band_frac=6.088e-02  edge_mean=4.272e-02  h4_delta_mag=1.869e+00  h4_delta_sat=2.198e-01  h4_ls_f=2.907e-02  h4_ls_h=2.970e-02  h4_ls_w=3.194e-02  h8_delta_mag=6.709e-01  h8_delta_sat=3.476e-02  h8_ls_f=2.046e-02  h8_ls_h=1.555e-02  h8_ls_w=1.904e-02  proto_ctx=4.949e-01
+Epoch 019/40 | Train Loss: 1.5892 | Val Dice: N/A
+  [tel] abs_delta=8.519e-02  band_frac=6.033e-02  edge_mean=4.186e-02  h4_delta_mag=2.140e+00  h4_delta_sat=2.513e-01  h4_ls_f=2.933e-02  h4_ls_h=2.978e-02  h4_ls_w=3.190e-02  h8_delta_mag=4.869e-01  h8_delta_sat=1.519e-02  h8_ls_f=2.122e-02  h8_ls_h=1.559e-02  h8_ls_w=1.927e-02  proto_ctx=5.093e-01
+
+--- Zero-shot MONITORING at epoch 20 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8664 | meanIoU: 0.7999 | S-m: 0.9200 | mean E-m: 0.9385 | max E-m: 0.9554 | max Fm(β²=0.3): 0.8947 | wFm: 0.8438 | MAE: 0.0112 | Recall@0.5: 0.9622 | HD95@0.5: 26.98px
+Dataset: CVC-CLINICDB    | meanDice: 0.9118 | meanIoU: 0.8632 | S-m: 0.9382 | mean E-m: 0.9639 | max E-m: 0.9678 | max Fm(β²=0.3): 0.9217 | wFm: 0.9053 | MAE: 0.0101 | Recall@0.5: 0.9625 | HD95@0.5: 13.15px
+Dataset: CVC-COLONDB     | meanDice: 0.7953 | meanIoU: 0.7202 | S-m: 0.8603 | mean E-m: 0.8861 | max E-m: 0.8892 | max Fm(β²=0.3): 0.8070 | wFm: 0.7756 | MAE: 0.0377 | Recall@0.5: 0.8803 | HD95@0.5: 53.17px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7566 | meanIoU: 0.6741 | S-m: 0.8522 | mean E-m: 0.8659 | max E-m: 0.8954 | max Fm(β²=0.3): 0.7944 | wFm: 0.7074 | MAE: 0.0283 | Recall@0.5: 0.9208 | HD95@0.5: 165.10px
+Dataset: KVASIR          | meanDice: 0.9057 | meanIoU: 0.8490 | S-m: 0.9164 | mean E-m: 0.9482 | max E-m: 0.9576 | max Fm(β²=0.3): 0.9215 | wFm: 0.8837 | MAE: 0.0287 | Recall@0.5: 0.9443 | HD95@0.5: 55.42px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8061  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8472 ---
+Epoch 020/40 | Train Loss: 1.5481 | Val Dice: N/A
+  [tel] abs_delta=9.092e-02  band_frac=5.987e-02  edge_mean=4.194e-02  h4_delta_mag=2.151e+00  h4_delta_sat=2.584e-01  h4_ls_f=2.960e-02  h4_ls_h=2.997e-02  h4_ls_w=3.199e-02  h8_delta_mag=4.298e-01  h8_delta_sat=1.032e-02  h8_ls_f=2.200e-02  h8_ls_h=1.591e-02  h8_ls_w=1.944e-02  proto_ctx=5.031e-01
+Epoch 021/40 | Train Loss: 1.5653 | Val Dice: N/A
+  [tel] abs_delta=9.280e-02  band_frac=6.021e-02  edge_mean=4.171e-02  h4_delta_mag=2.038e+00  h4_delta_sat=2.424e-01  h4_ls_f=2.968e-02  h4_ls_h=3.007e-02  h4_ls_w=3.230e-02  h8_delta_mag=4.952e-01  h8_delta_sat=1.767e-02  h8_ls_f=2.231e-02  h8_ls_h=1.614e-02  h8_ls_w=1.973e-02  proto_ctx=5.048e-01
+Epoch 022/40 | Train Loss: 1.5339 | Val Dice: N/A
+  [tel] abs_delta=8.972e-02  band_frac=6.003e-02  edge_mean=4.098e-02  h4_delta_mag=2.198e+00  h4_delta_sat=2.515e-01  h4_ls_f=2.986e-02  h4_ls_h=3.016e-02  h4_ls_w=3.249e-02  h8_delta_mag=4.637e-01  h8_delta_sat=1.415e-02  h8_ls_f=2.263e-02  h8_ls_h=1.622e-02  h8_ls_w=1.989e-02  proto_ctx=5.205e-01
+Epoch 023/40 | Train Loss: 1.4798 | Val Dice: N/A
+  [tel] abs_delta=9.516e-02  band_frac=5.955e-02  edge_mean=4.108e-02  h4_delta_mag=2.059e+00  h4_delta_sat=2.413e-01  h4_ls_f=2.990e-02  h4_ls_h=3.023e-02  h4_ls_w=3.260e-02  h8_delta_mag=4.288e-01  h8_delta_sat=1.119e-02  h8_ls_f=2.305e-02  h8_ls_h=1.633e-02  h8_ls_w=2.005e-02  proto_ctx=5.184e-01
+Epoch 024/40 | Train Loss: 1.4535 | Val Dice: N/A
+  [tel] abs_delta=9.872e-02  band_frac=5.954e-02  edge_mean=4.105e-02  h4_delta_mag=2.031e+00  h4_delta_sat=2.383e-01  h4_ls_f=2.999e-02  h4_ls_h=3.027e-02  h4_ls_w=3.266e-02  h8_delta_mag=3.706e-01  h8_delta_sat=6.676e-03  h8_ls_f=2.345e-02  h8_ls_h=1.654e-02  h8_ls_w=2.012e-02  proto_ctx=5.269e-01
+Epoch 025/40 | Train Loss: 1.4481 | Val Dice: N/A
+  [tel] abs_delta=9.541e-02  band_frac=5.958e-02  edge_mean=4.054e-02  h4_delta_mag=2.441e+00  h4_delta_sat=2.766e-01  h4_ls_f=3.024e-02  h4_ls_h=3.029e-02  h4_ls_w=3.270e-02  h8_delta_mag=4.392e-01  h8_delta_sat=1.119e-02  h8_ls_f=2.367e-02  h8_ls_h=1.662e-02  h8_ls_w=2.014e-02  proto_ctx=5.303e-01
+Epoch 026/40 | Train Loss: 1.4296 | Val Dice: N/A
+  [tel] abs_delta=9.326e-02  band_frac=5.952e-02  edge_mean=4.015e-02  h4_delta_mag=2.267e+00  h4_delta_sat=2.601e-01  h4_ls_f=3.043e-02  h4_ls_h=3.026e-02  h4_ls_w=3.272e-02  h8_delta_mag=4.297e-01  h8_delta_sat=1.065e-02  h8_ls_f=2.371e-02  h8_ls_h=1.677e-02  h8_ls_w=2.024e-02  proto_ctx=5.400e-01
+Epoch 027/40 | Train Loss: 1.3900 | Val Dice: N/A
+  [tel] abs_delta=9.364e-02  band_frac=5.929e-02  edge_mean=3.995e-02  h4_delta_mag=2.236e+00  h4_delta_sat=2.594e-01  h4_ls_f=3.059e-02  h4_ls_h=3.043e-02  h4_ls_w=3.280e-02  h8_delta_mag=4.239e-01  h8_delta_sat=9.714e-03  h8_ls_f=2.393e-02  h8_ls_h=1.685e-02  h8_ls_w=2.030e-02  proto_ctx=5.373e-01
+Epoch 028/40 | Train Loss: 1.3696 | Val Dice: N/A
+  [tel] abs_delta=9.827e-02  band_frac=5.896e-02  edge_mean=4.005e-02  h4_delta_mag=2.609e+00  h4_delta_sat=2.906e-01  h4_ls_f=3.065e-02  h4_ls_h=3.047e-02  h4_ls_w=3.277e-02  h8_delta_mag=3.794e-01  h8_delta_sat=6.586e-03  h8_ls_f=2.422e-02  h8_ls_h=1.690e-02  h8_ls_w=2.043e-02  proto_ctx=5.286e-01
+Epoch 029/40 | Train Loss: 1.3504 | Val Dice: N/A
+  [tel] abs_delta=9.505e-02  band_frac=5.893e-02  edge_mean=3.977e-02  h4_delta_mag=2.502e+00  h4_delta_sat=2.847e-01  h4_ls_f=3.073e-02  h4_ls_h=3.050e-02  h4_ls_w=3.275e-02  h8_delta_mag=3.867e-01  h8_delta_sat=6.884e-03  h8_ls_f=2.456e-02  h8_ls_h=1.697e-02  h8_ls_w=2.058e-02  proto_ctx=5.222e-01
+Epoch 030/40 | Train Loss: 1.3549 | Val Dice: N/A
+  [tel] abs_delta=9.458e-02  band_frac=5.882e-02  edge_mean=3.949e-02  h4_delta_mag=2.485e+00  h4_delta_sat=2.802e-01  h4_ls_f=3.086e-02  h4_ls_h=3.053e-02  h4_ls_w=3.281e-02  h8_delta_mag=4.007e-01  h8_delta_sat=7.510e-03  h8_ls_f=2.471e-02  h8_ls_h=1.707e-02  h8_ls_w=2.059e-02  proto_ctx=5.243e-01
+Epoch 031/40 | Train Loss: 1.3327 | Val Dice: N/A
+  [tel] abs_delta=9.163e-02  band_frac=5.876e-02  edge_mean=3.923e-02  h4_delta_mag=2.498e+00  h4_delta_sat=2.815e-01  h4_ls_f=3.096e-02  h4_ls_h=3.055e-02  h4_ls_w=3.278e-02  h8_delta_mag=4.446e-01  h8_delta_sat=1.052e-02  h8_ls_f=2.484e-02  h8_ls_h=1.714e-02  h8_ls_w=2.063e-02  proto_ctx=5.274e-01
+Epoch 032/40 | Train Loss: 1.3155 | Val Dice: N/A
+  [tel] abs_delta=9.066e-02  band_frac=5.876e-02  edge_mean=3.912e-02  h4_delta_mag=2.540e+00  h4_delta_sat=2.878e-01  h4_ls_f=3.099e-02  h4_ls_h=3.060e-02  h4_ls_w=3.277e-02  h8_delta_mag=4.118e-01  h8_delta_sat=7.996e-03  h8_ls_f=2.489e-02  h8_ls_h=1.720e-02  h8_ls_w=2.069e-02  proto_ctx=5.222e-01
+Epoch 033/40 | Train Loss: 1.2949 | Val Dice: N/A
+  [tel] abs_delta=9.057e-02  band_frac=5.866e-02  edge_mean=3.907e-02  h4_delta_mag=2.415e+00  h4_delta_sat=2.789e-01  h4_ls_f=3.101e-02  h4_ls_h=3.061e-02  h4_ls_w=3.279e-02  h8_delta_mag=3.953e-01  h8_delta_sat=6.603e-03  h8_ls_f=2.499e-02  h8_ls_h=1.722e-02  h8_ls_w=2.071e-02  proto_ctx=5.214e-01
+Epoch 034/40 | Train Loss: 1.2889 | Val Dice: N/A
+  [tel] abs_delta=9.197e-02  band_frac=5.861e-02  edge_mean=3.910e-02  h4_delta_mag=2.524e+00  h4_delta_sat=2.892e-01  h4_ls_f=3.104e-02  h4_ls_h=3.062e-02  h4_ls_w=3.278e-02  h8_delta_mag=3.823e-01  h8_delta_sat=5.546e-03  h8_ls_f=2.505e-02  h8_ls_h=1.726e-02  h8_ls_w=2.074e-02  proto_ctx=5.162e-01
+Epoch 035/40 | Train Loss: 1.2785 | Val Dice: N/A
+  [tel] abs_delta=9.074e-02  band_frac=5.857e-02  edge_mean=3.893e-02  h4_delta_mag=2.528e+00  h4_delta_sat=2.859e-01  h4_ls_f=3.107e-02  h4_ls_h=3.061e-02  h4_ls_w=3.280e-02  h8_delta_mag=3.976e-01  h8_delta_sat=6.547e-03  h8_ls_f=2.510e-02  h8_ls_h=1.729e-02  h8_ls_w=2.075e-02  proto_ctx=5.141e-01
+Epoch 036/40 | Train Loss: 1.2750 | Val Dice: N/A
+  [tel] abs_delta=9.161e-02  band_frac=5.854e-02  edge_mean=3.896e-02  h4_delta_mag=2.481e+00  h4_delta_sat=2.829e-01  h4_ls_f=3.109e-02  h4_ls_h=3.061e-02  h4_ls_w=3.281e-02  h8_delta_mag=3.977e-01  h8_delta_sat=6.607e-03  h8_ls_f=2.512e-02  h8_ls_h=1.730e-02  h8_ls_w=2.077e-02  proto_ctx=5.122e-01
+Epoch 037/40 | Train Loss: 1.2689 | Val Dice: N/A
+  [tel] abs_delta=9.117e-02  band_frac=5.857e-02  edge_mean=3.892e-02  h4_delta_mag=2.504e+00  h4_delta_sat=2.870e-01  h4_ls_f=3.111e-02  h4_ls_h=3.063e-02  h4_ls_w=3.282e-02  h8_delta_mag=3.907e-01  h8_delta_sat=6.043e-03  h8_ls_f=2.516e-02  h8_ls_h=1.731e-02  h8_ls_w=2.078e-02  proto_ctx=5.104e-01
+Epoch 038/40 | Train Loss: 1.2718 | Val Dice: N/A
+  [tel] abs_delta=9.069e-02  band_frac=5.858e-02  edge_mean=3.886e-02  h4_delta_mag=2.457e+00  h4_delta_sat=2.801e-01  h4_ls_f=3.110e-02  h4_ls_h=3.062e-02  h4_ls_w=3.282e-02  h8_delta_mag=3.926e-01  h8_delta_sat=6.220e-03  h8_ls_f=2.517e-02  h8_ls_h=1.731e-02  h8_ls_w=2.078e-02  proto_ctx=5.104e-01
+Epoch 039/40 | Train Loss: 1.2561 | Val Dice: N/A
+  [tel] abs_delta=9.016e-02  band_frac=5.850e-02  edge_mean=3.883e-02  h4_delta_mag=2.494e+00  h4_delta_sat=2.855e-01  h4_ls_f=3.112e-02  h4_ls_h=3.063e-02  h4_ls_w=3.283e-02  h8_delta_mag=3.876e-01  h8_delta_sat=5.889e-03  h8_ls_f=2.518e-02  h8_ls_h=1.732e-02  h8_ls_w=2.079e-02  proto_ctx=5.104e-01
+
+--- Zero-shot MONITORING at epoch 40 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8872 | meanIoU: 0.8208 | S-m: 0.9303 | mean E-m: 0.9564 | max E-m: 0.9784 | max Fm(β²=0.3): 0.9182 | wFm: 0.8667 | MAE: 0.0072 | Recall@0.5: 0.9542 | HD95@0.5: 18.25px
+Dataset: CVC-CLINICDB    | meanDice: 0.9325 | meanIoU: 0.8874 | S-m: 0.9478 | mean E-m: 0.9781 | max E-m: 0.9817 | max Fm(β²=0.3): 0.9431 | wFm: 0.9305 | MAE: 0.0064 | Recall@0.5: 0.9561 | HD95@0.5: 8.37px
+Dataset: CVC-COLONDB     | meanDice: 0.7988 | meanIoU: 0.7186 | S-m: 0.8610 | mean E-m: 0.8903 | max E-m: 0.8946 | max Fm(β²=0.3): 0.8200 | wFm: 0.7803 | MAE: 0.0358 | Recall@0.5: 0.8596 | HD95@0.5: 55.84px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7896 | meanIoU: 0.7109 | S-m: 0.8746 | mean E-m: 0.9002 | max E-m: 0.9103 | max Fm(β²=0.3): 0.8052 | wFm: 0.7515 | MAE: 0.0169 | Recall@0.5: 0.8867 | HD95@0.5: 133.73px
+Dataset: KVASIR          | meanDice: 0.9159 | meanIoU: 0.8667 | S-m: 0.9234 | mean E-m: 0.9638 | max E-m: 0.9677 | max Fm(β²=0.3): 0.9316 | wFm: 0.9090 | MAE: 0.0221 | Recall@0.5: 0.9135 | HD95@0.5: 44.78px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8252  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8648 ---
+`Trainer.fit` stopped: `max_epochs=40` reached.
+
+Saving lightning_logs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R2/lightning_logs
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R2/runs
+Checkpoint backup complete (lightning_logs: 3 copied, 2 unchanged; runs: 1 copied, 8 unchanged).
+
+[train] exit 0 after 1.90 h. Log at /content/drive/MyDrive/abl_R2_log.txt
+
+======================================================================
+SCORING R2 on last.ckpt
+======================================================================
+[score] checkpoint: /content/polp_wacv/lightning_logs/version_0/checkpoints/last.ckpt
+[score] epoch=39 mamba_freq_axis=True use_mamba_bottleneck=True mamba_stage=h4h8 mamba_scan=raster
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8872 | meanIoU: 0.8208 | S-m: 0.9303 | mean E-m: 0.9564 | max E-m: 0.9784 | max Fm(β²=0.3): 0.9182 | wFm: 0.8667 | MAE: 0.0072 | Recall@0.5: 0.9542 | HD95@0.5: 18.25px
+Dataset: CVC-CLINICDB    | meanDice: 0.9325 | meanIoU: 0.8874 | S-m: 0.9477 | mean E-m: 0.9781 | max E-m: 0.9817 | max Fm(β²=0.3): 0.9431 | wFm: 0.9305 | MAE: 0.0064 | Recall@0.5: 0.9561 | HD95@0.5: 8.37px
+Dataset: CVC-COLONDB     | meanDice: 0.7988 | meanIoU: 0.7186 | S-m: 0.8610 | mean E-m: 0.8903 | max E-m: 0.8946 | max Fm(β²=0.3): 0.8200 | wFm: 0.7803 | MAE: 0.0358 | Recall@0.5: 0.8596 | HD95@0.5: 55.84px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7896 | meanIoU: 0.7109 | S-m: 0.8746 | mean E-m: 0.9002 | max E-m: 0.9103 | max Fm(β²=0.3): 0.8052 | wFm: 0.7515 | MAE: 0.0169 | Recall@0.5: 0.8867 | HD95@0.5: 133.73px
+Dataset: KVASIR          | meanDice: 0.9159 | meanIoU: 0.8667 | S-m: 0.9234 | mean E-m: 0.9638 | max E-m: 0.9677 | max Fm(β²=0.3): 0.9316 | wFm: 0.9090 | MAE: 0.0221 | Recall@0.5: 0.9135 | HD95@0.5: 44.78px
+--- R2: released prediction maps, scored on the canonical PraNet estimator ---
+Dataset: CVC-300              | mDice: 0.8872 | mIoU: 0.8208 | S-m: 0.9303 | max E-m: 0.9784 | wFm: 0.8667 | MAE: 0.0072 | Recall@0.5: 0.9542 | HD95@0.5: 18.25px | n=60/60
+Dataset: CVC-CLINICDB         | mDice: 0.9325 | mIoU: 0.8874 | S-m: 0.9477 | max E-m: 0.9817 | wFm: 0.9305 | MAE: 0.0064 | Recall@0.5: 0.9561 | HD95@0.5: 8.37px | n=62/62
+Dataset: CVC-COLONDB          | mDice: 0.7988 | mIoU: 0.7186 | S-m: 0.8610 | max E-m: 0.8946 | wFm: 0.7803 | MAE: 0.0358 | Recall@0.5: 0.8596 | HD95@0.5: 55.84px | n=380/380
+Dataset: ETIS-LARIBPOLYPDB    | mDice: 0.7896 | mIoU: 0.7109 | S-m: 0.8746 | max E-m: 0.9103 | wFm: 0.7515 | MAE: 0.0169 | Recall@0.5: 0.8867 | HD95@0.5: 133.73px | n=196/196
+Dataset: KVASIR               | mDice: 0.9159 | mIoU: 0.8667 | S-m: 0.9234 | max E-m: 0.9677 | wFm: 0.9090 | MAE: 0.0221 | Recall@0.5: 0.9135 | HD95@0.5: 44.78px | n=100/100
+
+ZS-3 mean mDice (CVC-300 / ColonDB / ETIS): 0.8252
+wrote /content/polp_wacv/runs/abl_R2.json
+[config] encoder=pvt_v2_b2 use_fcc_decoder=True fcc_channel=64 fcc_reduce_octave=False fcc_region_calib=True fcc_region_proto=True use_boundary_attn=False use_wavelet_decoder=False use_rfp=False use_mamba_bottleneck=True mamba_bidirectional=True mamba_stage=h4h8 mamba_scan=raster mamba_freq_axis=True freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq edge_stride=4 — pass these flags to match the checkpoint you're profiling.
+Params (M):   34.85
+GMACs:        16.366  [thop, input 352x352, batch=1 — THIS IS THE PAPER NUMBER, same tool every competitor row used]
+FLOPs (G):    32.73  [2 x MACs; do not mix the two conventions in one column]
+FPS:          26.4  [batch=1, input 352x352, 100 reps]
+Peak GPU mem: 5.82 GB  [fwd+bwd, batch=8]
+[params] R2: 34.85 M vs expected 34.85 M -- OK
+[check] monitor ZS-3 @ep40: 0.8252  |  scored from last.ckpt: 0.8252  |  delta -0.0000
+[disk] pruned 0.79 GB of intermediate checkpoints from WACV_2027_Checkpoints_abl_R2 (last.ckpt kept).
+
+======================================================================
+ARM R2 COMPLETE — 1.90 h training
+  Kvasir               mDice 0.9159
+  CVC-ClinicDB         mDice 0.9325
+  CVC-300              mDice 0.8872
+  CVC-ColonDB          mDice 0.7988
+  ETIS-LaribPolypDB    mDice 0.7896
+  (internal ZS-3)      0.8252  monitor 0.8252
+  params                      : 34.85 M
+  scored from                 : last.ckpt @ epoch 39
+  backed up to Drive          : abl_R2.json, abl_R2_cost.txt, abl_R2_seed0.json, preds_R2.zip
+======================================================================
+
+======================================================================
+[4/4] starting R3 — 16882s into the sweep, Wed 00:02
+======================================================================
+
+######################################################################
+# ARM R3 — FULL — + endoscopy augmentation and HAT target perturbation (== fin2 at 40 ep)
+#   flags  : --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+#   backup : /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R3
+#   log    : /content/drive/MyDrive/abl_R3_log.txt
+######################################################################
+
+[setup] FRESH start — no existing backup
+[setup] cleared /content/polp_wacv/lightning_logs (the launcher restores this arm's own copy if any)
+======================================================================
+PRE-FLIGHT R3 (--dry-run): full env/dataset/mamba audit, no training.
+======================================================================
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R3 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug endo --hat-prob 0.5 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R3_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug endo --hat-prob 0.5 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R3_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] --dry-run set, exiting without launching training.
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R3/runs
+Checkpoint backup complete (runs: 11 copied, 0 unchanged).
+
+======================================================================
+PRE-FLIGHT PASSED in 0.2 min. 23 flags present, 8 absent.
+LAUNCHING R3 — 40 epochs, code @ b8ed1e28. Log: /content/drive/MyDrive/abl_R3_log.txt
+======================================================================
+
+
+============================================================
+[1/10] Environment Check
+============================================================
+Python : 3.12.13
+PyTorch: 2.11.0+cu128  |  CUDA: 12.8  |  GPU: NVIDIA L4
+
+============================================================
+[2/10] Google Drive Check
+============================================================
+Drive mounted at /content/drive — OK
+
+============================================================
+[4/10] Clean Workspace
+============================================================
+  TrainDataset: 2900 total files — keeping.
+  TestDataset: 1596 total files — keeping.
+  Workspace clean — nothing to remove.
+
+============================================================
+[5/10] Repository Setup
+============================================================
+Repo exists — fetching and checking out sota-fcc-boundary-calib ...
+Already up to date.
+Working dir: /content/polp_wacv (branch: sota-fcc-boundary-calib)
+
+============================================================
+[6/10] Dependencies
+============================================================
+Installing requirements.txt ...
+mamba_ssm already importable — skipping causal-conv1d/mamba-ssm install.
+Dependencies installed.
+
+============================================================
+[7/10] Dataset Download
+============================================================
+  Both datasets already present (exact counts) — skipping.
+
+============================================================
+[8/10] Dataset Structure Audit
+============================================================
+
+  [TestDataset]  /content/TestDataset
+
+    Split                      images   masks  expect  paired  status
+    ------------------------- ------- ------- ------- -------  ------
+    CVC-300                        60      60      60    True  OK
+    CVC-ClinicDB                   62      62      62    True  OK
+    CVC-ColonDB                   380     380     380    True  OK
+    ETIS-LaribPolypDB             196     196     196    True  OK
+    Kvasir                        100     100     100    True  OK
+
+  [TrainDataset]  /content/TrainDataset
+    Dirs      : image/ (1450 files) + masks/ (1450 files)
+    Paired    : True
+    Split     : full set, no val holdout (1450 train, PraNet convention)
+    Extensions: images={'.png'}  masks={'.png'}
+
+  All dataset checks PASSED.
+
+============================================================
+[9/10] Save Datasets to Drive
+============================================================
+  TrainDataset already in Drive backup — skipping.
+  TestDataset already in Drive backup — skipping.
+  All datasets already backed up to Drive.
+  Checkpoint backup registered -> /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R3 (on exit/interrupt, and every 15 min).
+
+============================================================
+[10/10] Launch Training
+============================================================
+--fresh: will wipe lightning_logs/ and train from scratch.
+[launcher] Forwarding to train.py: --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug endo --hat-prob 0.5 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R3_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+[launcher] Resolved training command: /usr/bin/python3 -u src/train.py --fresh --model ours --encoder pvt_v2_b2 --epochs 40 --seed 0 --precision bf16-mixed --lr-schedule cosine --warmup-epochs 5 --bce-unweighted --iou-smooth 1.0 --ms-mask-interp bilinear --boundary-dice-weight 0.3 --contrast-weight 0.1 --fcc-channel 64 --edge-stride 4 --aug endo --hat-prob 0.5 --val-fraction 0 --select-on indomain --select-weights raw --zeroshot-every 20 --zeroshot-history runs/abl_R3_seed0.json --fcc-region-proto --ds-mutation --mamba-stage h4h8 --mamba-scan raster --mamba-bidirectional
+
+Seed set to 0
+[precision] lightning=bf16-mixed float32_matmul=medium
+[run-config] model=ours encoder=pvt_v2_b2 recipe=ours seed=0 epochs=40 bs=16 accum=1 lr=0.0001 wd=0.0001 aug=endo hat_prob=0.5 fda=0.0@beta0.01 val_fraction=0.0 split_seed=0 lr_schedule=cosine warmup=5 restart_cycle_len=20 encoder_lr_scale=1.0 clip=value@0.5 multi_scale=True step_per_scale=True use_fcc_decoder=True fcc_region_calib=True fcc_edge_weight=3.0 fcc_share_bn=False fcc_channel=64 fcc_reduce_octave=False bce_unweighted=True iou_smooth=1.0 ms_mask_interp=bilinear img_size=352 fullres_head=False select_on_test=False select_on=indomain select_weights=raw use_rfp=False edge_stride=4 mamba_stage=h4h8 mamba_scan=raster mamba_freq_axis=True mamba_ls_init=0.0001 freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq fcc_region_proto=True ema_decay=0.0 precision=bf16-mixed matmul_precision=medium use_mamba_bottleneck=True ds_mutation=True mamba_bidirectional=True tversky=0.0@(0.7,0.3) boundary_dice=0.3 contrast_weight=0.1
+
+[check] [run-config] matches all 28 required settings for R3.
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[params] total=35.088 M encoder=24.850 M fcc_decoder=9.046 M
+WARNING: --val-fraction 0 - no held-out split, so there is no blind selection signal. Report 'last', or pass --select-on-test to reproduce the published max-over-epochs-on-test rule and label the number accordingly.
+Using bfloat16 Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+--fresh: no lightning_logs/ found, already clean.
+⏬ Loading WACV Benchmark Train Dataset from /content/TrainDataset (aug=endo, hat_prob=0.5, img_size=352)...
+✅ Loaded 1450 train / 0 val images (val_fraction=0.0, split seed=0)
+   effective train images/epoch: 1440 of 1450 (0 held out, 10 dropped by drop_last at batch_size=16)
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/model_summary/model_summary.py:242: Precision bf16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
+┏━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name          ┃ Type              ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model         │ SpectraMambaNet   │ 35.1 M │ train │     0 │
+│ 1 │ contrast_loss │ PixelContrastLoss │      0 │ train │     0 │
+└───┴───────────────┴───────────────────┴────────┴───────┴───────┘
+Trainable params: 35.1 M                                                        
+Non-trainable params: 0                                                         
+Total params: 35.1 M                                                            
+Total estimated model params size (MB): 140.353                                 
+Modules in train mode: 754                                                      
+Modules in eval mode: 0                                                         
+Total FLOPs: 0                                                                  
+/usr/local/lib/python3.12/dist-packages/pytorch_lightning/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 000/40 | Train Loss: 6.7043 | Val Dice: N/A
+  [tel] abs_delta=5.175e-04  band_frac=7.248e-02  edge_mean=3.855e-01  h4_delta_mag=2.769e-03  h4_delta_sat=0.000e+00  h4_ls_f=1.188e-03  h4_ls_h=1.091e-03  h4_ls_w=9.583e-04  h8_delta_mag=6.671e-04  h8_delta_sat=0.000e+00  h8_ls_f=4.569e-04  h8_ls_h=4.792e-04  h8_ls_w=4.557e-04  proto_ctx=1.171e-02
+Epoch 001/40 | Train Loss: 5.0622 | Val Dice: N/A
+
+[eta] 2.5 min/epoch measured. This arm: 38 epochs left -> ~1.6 h, done around 01:50. Whole sweep (0 more arms after this one): ~1.6 h -> Wed 01:50.
+
+  [tel] abs_delta=6.056e-04  band_frac=6.519e-02  edge_mean=2.907e-01  h4_delta_mag=1.111e-01  h4_delta_sat=1.033e-05  h4_ls_f=6.952e-03  h4_ls_h=8.437e-03  h4_ls_w=7.979e-03  h8_delta_mag=3.307e-03  h8_delta_sat=0.000e+00  h8_ls_f=1.381e-03  h8_ls_h=1.711e-03  h8_ls_w=1.494e-03  proto_ctx=1.457e-02
+Epoch 002/40 | Train Loss: 4.2108 | Val Dice: N/A
+  [tel] abs_delta=7.930e-03  band_frac=6.598e-02  edge_mean=2.206e-01  h4_delta_mag=4.350e-01  h4_delta_sat=7.141e-03  h4_ls_f=1.750e-02  h4_ls_h=1.919e-02  h4_ls_w=1.990e-02  h8_delta_mag=6.676e-02  h8_delta_sat=0.000e+00  h8_ls_f=3.296e-03  h8_ls_h=5.465e-03  h8_ls_w=4.889e-03  proto_ctx=7.790e-02
+Epoch 003/40 | Train Loss: 3.5828 | Val Dice: N/A
+  [tel] abs_delta=3.288e-02  band_frac=6.463e-02  edge_mean=1.622e-01  h4_delta_mag=1.038e+00  h4_delta_sat=9.001e-02  h4_ls_f=2.396e-02  h4_ls_h=2.596e-02  h4_ls_w=2.621e-02  h8_delta_mag=1.835e-01  h8_delta_sat=2.873e-07  h8_ls_f=5.130e-03  h8_ls_h=8.769e-03  h8_ls_w=8.920e-03  proto_ctx=1.853e-01
+Epoch 004/40 | Train Loss: 3.2510 | Val Dice: N/A
+  [tel] abs_delta=5.451e-02  band_frac=6.664e-02  edge_mean=1.273e-01  h4_delta_mag=1.195e+00  h4_delta_sat=1.143e-01  h4_ls_f=2.432e-02  h4_ls_h=2.705e-02  h4_ls_w=2.782e-02  h8_delta_mag=3.744e-01  h8_delta_sat=4.607e-04  h8_ls_f=6.517e-03  h8_ls_h=1.029e-02  h8_ls_w=1.113e-02  proto_ctx=2.074e-01
+Epoch 005/40 | Train Loss: 2.9563 | Val Dice: N/A
+  [tel] abs_delta=7.279e-02  band_frac=6.593e-02  edge_mean=1.035e-01  h4_delta_mag=1.361e+00  h4_delta_sat=1.334e-01  h4_ls_f=2.468e-02  h4_ls_h=2.708e-02  h4_ls_w=2.846e-02  h8_delta_mag=4.430e-01  h8_delta_sat=2.401e-03  h8_ls_f=7.943e-03  h8_ls_h=1.116e-02  h8_ls_w=1.248e-02  proto_ctx=2.091e-01
+Epoch 006/40 | Train Loss: 2.7456 | Val Dice: N/A
+  [tel] abs_delta=8.006e-02  band_frac=6.660e-02  edge_mean=8.714e-02  h4_delta_mag=1.709e+00  h4_delta_sat=1.694e-01  h4_ls_f=2.496e-02  h4_ls_h=2.741e-02  h4_ls_w=2.913e-02  h8_delta_mag=5.344e-01  h8_delta_sat=6.710e-03  h8_ls_f=9.428e-03  h8_ls_h=1.182e-02  h8_ls_w=1.324e-02  proto_ctx=1.853e-01
+Epoch 007/40 | Train Loss: 2.5680 | Val Dice: N/A
+  [tel] abs_delta=7.844e-02  band_frac=6.603e-02  edge_mean=7.524e-02  h4_delta_mag=2.218e+00  h4_delta_sat=2.302e-01  h4_ls_f=2.518e-02  h4_ls_h=2.792e-02  h4_ls_w=2.963e-02  h8_delta_mag=6.036e-01  h8_delta_sat=1.209e-02  h8_ls_f=1.102e-02  h8_ls_h=1.234e-02  h8_ls_w=1.403e-02  proto_ctx=1.492e-01
+Epoch 008/40 | Train Loss: 2.4205 | Val Dice: N/A
+  [tel] abs_delta=8.256e-02  band_frac=6.494e-02  edge_mean=6.715e-02  h4_delta_mag=2.165e+00  h4_delta_sat=2.187e-01  h4_ls_f=2.527e-02  h4_ls_h=2.844e-02  h4_ls_w=2.997e-02  h8_delta_mag=5.169e-01  h8_delta_sat=7.874e-03  h8_ls_f=1.261e-02  h8_ls_h=1.283e-02  h8_ls_w=1.454e-02  proto_ctx=1.341e-01
+Epoch 009/40 | Train Loss: 2.3019 | Val Dice: N/A
+  [tel] abs_delta=8.545e-02  band_frac=6.527e-02  edge_mean=6.186e-02  h4_delta_mag=2.493e+00  h4_delta_sat=2.543e-01  h4_ls_f=2.535e-02  h4_ls_h=2.846e-02  h4_ls_w=3.019e-02  h8_delta_mag=5.728e-01  h8_delta_sat=1.683e-02  h8_ls_f=1.364e-02  h8_ls_h=1.338e-02  h8_ls_w=1.514e-02  proto_ctx=1.252e-01
+Epoch 010/40 | Train Loss: 2.2222 | Val Dice: N/A
+  [tel] abs_delta=8.247e-02  band_frac=6.447e-02  edge_mean=5.736e-02  h4_delta_mag=2.496e+00  h4_delta_sat=2.565e-01  h4_ls_f=2.549e-02  h4_ls_h=2.905e-02  h4_ls_w=3.056e-02  h8_delta_mag=5.097e-01  h8_delta_sat=1.110e-02  h8_ls_f=1.473e-02  h8_ls_h=1.361e-02  h8_ls_w=1.567e-02  proto_ctx=1.087e-01
+Epoch 011/40 | Train Loss: 2.1693 | Val Dice: N/A
+  [tel] abs_delta=8.886e-02  band_frac=6.467e-02  edge_mean=5.474e-02  h4_delta_mag=2.578e+00  h4_delta_sat=2.495e-01  h4_ls_f=2.566e-02  h4_ls_h=2.947e-02  h4_ls_w=3.078e-02  h8_delta_mag=7.260e-01  h8_delta_sat=3.381e-02  h8_ls_f=1.582e-02  h8_ls_h=1.377e-02  h8_ls_w=1.592e-02  proto_ctx=1.092e-01
+Epoch 012/40 | Train Loss: 2.0462 | Val Dice: N/A
+  [tel] abs_delta=8.805e-02  band_frac=6.329e-02  edge_mean=5.180e-02  h4_delta_mag=2.772e+00  h4_delta_sat=2.732e-01  h4_ls_f=2.573e-02  h4_ls_h=2.992e-02  h4_ls_w=3.125e-02  h8_delta_mag=4.418e-01  h8_delta_sat=7.508e-03  h8_ls_f=1.684e-02  h8_ls_h=1.410e-02  h8_ls_w=1.654e-02  proto_ctx=1.222e-01
+Epoch 013/40 | Train Loss: 2.0038 | Val Dice: N/A
+  [tel] abs_delta=9.206e-02  band_frac=6.384e-02  edge_mean=5.052e-02  h4_delta_mag=2.302e+00  h4_delta_sat=2.426e-01  h4_ls_f=2.592e-02  h4_ls_h=3.042e-02  h4_ls_w=3.171e-02  h8_delta_mag=5.562e-01  h8_delta_sat=1.873e-02  h8_ls_f=1.812e-02  h8_ls_h=1.454e-02  h8_ls_w=1.695e-02  proto_ctx=1.369e-01
+Epoch 014/40 | Train Loss: 1.9142 | Val Dice: N/A
+  [tel] abs_delta=9.756e-02  band_frac=6.239e-02  edge_mean=4.929e-02  h4_delta_mag=2.290e+00  h4_delta_sat=2.442e-01  h4_ls_f=2.632e-02  h4_ls_h=3.054e-02  h4_ls_w=3.191e-02  h8_delta_mag=6.699e-01  h8_delta_sat=2.944e-02  h8_ls_f=1.907e-02  h8_ls_h=1.482e-02  h8_ls_w=1.723e-02  proto_ctx=1.486e-01
+Epoch 015/40 | Train Loss: 1.9719 | Val Dice: N/A
+  [tel] abs_delta=1.002e-01  band_frac=6.406e-02  edge_mean=4.866e-02  h4_delta_mag=3.153e+00  h4_delta_sat=3.155e-01  h4_ls_f=2.658e-02  h4_ls_h=3.084e-02  h4_ls_w=3.222e-02  h8_delta_mag=7.207e-01  h8_delta_sat=4.110e-02  h8_ls_f=1.960e-02  h8_ls_h=1.515e-02  h8_ls_w=1.763e-02  proto_ctx=1.670e-01
+Epoch 016/40 | Train Loss: 1.9185 | Val Dice: N/A
+  [tel] abs_delta=1.043e-01  band_frac=6.389e-02  edge_mean=4.788e-02  h4_delta_mag=3.504e+00  h4_delta_sat=3.553e-01  h4_ls_f=2.672e-02  h4_ls_h=3.112e-02  h4_ls_w=3.235e-02  h8_delta_mag=7.922e-01  h8_delta_sat=4.790e-02  h8_ls_f=2.034e-02  h8_ls_h=1.540e-02  h8_ls_w=1.804e-02  proto_ctx=1.651e-01
+Epoch 017/40 | Train Loss: 1.8103 | Val Dice: N/A
+  [tel] abs_delta=1.014e-01  band_frac=6.184e-02  edge_mean=4.650e-02  h4_delta_mag=4.301e+00  h4_delta_sat=4.069e-01  h4_ls_f=2.708e-02  h4_ls_h=3.120e-02  h4_ls_w=3.253e-02  h8_delta_mag=5.905e-01  h8_delta_sat=2.335e-02  h8_ls_f=2.122e-02  h8_ls_h=1.562e-02  h8_ls_w=1.831e-02  proto_ctx=1.732e-01
+Epoch 018/40 | Train Loss: 1.7783 | Val Dice: N/A
+  [tel] abs_delta=9.770e-02  band_frac=6.205e-02  edge_mean=4.545e-02  h4_delta_mag=4.192e+00  h4_delta_sat=3.975e-01  h4_ls_f=2.727e-02  h4_ls_h=3.159e-02  h4_ls_w=3.270e-02  h8_delta_mag=5.655e-01  h8_delta_sat=2.095e-02  h8_ls_f=2.188e-02  h8_ls_h=1.587e-02  h8_ls_w=1.869e-02  proto_ctx=1.978e-01
+Epoch 019/40 | Train Loss: 1.7917 | Val Dice: N/A
+  [tel] abs_delta=1.051e-01  band_frac=6.272e-02  edge_mean=4.548e-02  h4_delta_mag=4.854e+00  h4_delta_sat=4.295e-01  h4_ls_f=2.741e-02  h4_ls_h=3.170e-02  h4_ls_w=3.279e-02  h8_delta_mag=5.548e-01  h8_delta_sat=1.875e-02  h8_ls_f=2.223e-02  h8_ls_h=1.606e-02  h8_ls_w=1.892e-02  proto_ctx=2.018e-01
+
+--- Zero-shot MONITORING at epoch 20 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8492 | meanIoU: 0.7713 | S-m: 0.9043 | mean E-m: 0.9302 | max E-m: 0.9720 | max Fm(β²=0.3): 0.9138 | wFm: 0.8140 | MAE: 0.0134 | Recall@0.5: 0.9614 | HD95@0.5: 52.65px
+Dataset: CVC-CLINICDB    | meanDice: 0.9111 | meanIoU: 0.8604 | S-m: 0.9364 | mean E-m: 0.9675 | max E-m: 0.9799 | max Fm(β²=0.3): 0.9339 | wFm: 0.9016 | MAE: 0.0100 | Recall@0.5: 0.9574 | HD95@0.5: 15.94px
+Dataset: CVC-COLONDB     | meanDice: 0.7640 | meanIoU: 0.6871 | S-m: 0.8414 | mean E-m: 0.8622 | max E-m: 0.8798 | max Fm(β²=0.3): 0.7841 | wFm: 0.7369 | MAE: 0.0461 | Recall@0.5: 0.8745 | HD95@0.5: 70.43px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.7633 | meanIoU: 0.6794 | S-m: 0.8566 | mean E-m: 0.8715 | max E-m: 0.8987 | max Fm(β²=0.3): 0.7889 | wFm: 0.7131 | MAE: 0.0200 | Recall@0.5: 0.9033 | HD95@0.5: 160.21px
+Dataset: KVASIR          | meanDice: 0.9183 | meanIoU: 0.8665 | S-m: 0.9274 | mean E-m: 0.9578 | max E-m: 0.9614 | max Fm(β²=0.3): 0.9366 | wFm: 0.9086 | MAE: 0.0231 | Recall@0.5: 0.9271 | HD95@0.5: 44.02px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.7922  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8412 ---
+Epoch 020/40 | Train Loss: 1.7327 | Val Dice: N/A
+  [tel] abs_delta=1.093e-01  band_frac=6.207e-02  edge_mean=4.541e-02  h4_delta_mag=5.332e+00  h4_delta_sat=4.474e-01  h4_ls_f=2.761e-02  h4_ls_h=3.208e-02  h4_ls_w=3.295e-02  h8_delta_mag=5.750e-01  h8_delta_sat=2.112e-02  h8_ls_f=2.247e-02  h8_ls_h=1.625e-02  h8_ls_w=1.904e-02  proto_ctx=2.167e-01
+Epoch 021/40 | Train Loss: 1.7050 | Val Dice: N/A
+  [tel] abs_delta=1.102e-01  band_frac=6.175e-02  edge_mean=4.508e-02  h4_delta_mag=5.750e+00  h4_delta_sat=4.427e-01  h4_ls_f=2.795e-02  h4_ls_h=3.230e-02  h4_ls_w=3.304e-02  h8_delta_mag=6.085e-01  h8_delta_sat=2.339e-02  h8_ls_f=2.299e-02  h8_ls_h=1.643e-02  h8_ls_w=1.918e-02  proto_ctx=2.182e-01
+Epoch 022/40 | Train Loss: 1.6982 | Val Dice: N/A
+  [tel] abs_delta=1.076e-01  band_frac=6.176e-02  edge_mean=4.459e-02  h4_delta_mag=6.279e+00  h4_delta_sat=4.563e-01  h4_ls_f=2.809e-02  h4_ls_h=3.233e-02  h4_ls_w=3.318e-02  h8_delta_mag=6.074e-01  h8_delta_sat=2.305e-02  h8_ls_f=2.360e-02  h8_ls_h=1.652e-02  h8_ls_w=1.942e-02  proto_ctx=2.202e-01
+Epoch 023/40 | Train Loss: 1.6498 | Val Dice: N/A
+  [tel] abs_delta=1.028e-01  band_frac=6.104e-02  edge_mean=4.349e-02  h4_delta_mag=6.914e+00  h4_delta_sat=4.726e-01  h4_ls_f=2.818e-02  h4_ls_h=3.242e-02  h4_ls_w=3.328e-02  h8_delta_mag=5.011e-01  h8_delta_sat=1.401e-02  h8_ls_f=2.416e-02  h8_ls_h=1.669e-02  h8_ls_w=1.967e-02  proto_ctx=2.244e-01
+Epoch 024/40 | Train Loss: 1.5846 | Val Dice: N/A
+  [tel] abs_delta=9.548e-02  band_frac=6.047e-02  edge_mean=4.265e-02  h4_delta_mag=7.232e+00  h4_delta_sat=4.879e-01  h4_ls_f=2.841e-02  h4_ls_h=3.275e-02  h4_ls_w=3.334e-02  h8_delta_mag=5.003e-01  h8_delta_sat=1.472e-02  h8_ls_f=2.464e-02  h8_ls_h=1.688e-02  h8_ls_w=1.981e-02  proto_ctx=2.435e-01
+Epoch 025/40 | Train Loss: 1.5744 | Val Dice: N/A
+  [tel] abs_delta=9.380e-02  band_frac=6.035e-02  edge_mean=4.222e-02  h4_delta_mag=7.590e+00  h4_delta_sat=4.963e-01  h4_ls_f=2.856e-02  h4_ls_h=3.290e-02  h4_ls_w=3.341e-02  h8_delta_mag=4.539e-01  h8_delta_sat=1.014e-02  h8_ls_f=2.496e-02  h8_ls_h=1.702e-02  h8_ls_w=2.000e-02  proto_ctx=2.447e-01
+Epoch 026/40 | Train Loss: 1.5916 | Val Dice: N/A
+  [tel] abs_delta=9.806e-02  band_frac=6.114e-02  edge_mean=4.238e-02  h4_delta_mag=8.439e+00  h4_delta_sat=5.047e-01  h4_ls_f=2.872e-02  h4_ls_h=3.297e-02  h4_ls_w=3.345e-02  h8_delta_mag=4.602e-01  h8_delta_sat=1.059e-02  h8_ls_f=2.521e-02  h8_ls_h=1.700e-02  h8_ls_w=2.018e-02  proto_ctx=2.433e-01
+Epoch 027/40 | Train Loss: 1.5959 | Val Dice: N/A
+  [tel] abs_delta=9.816e-02  band_frac=6.133e-02  edge_mean=4.224e-02  h4_delta_mag=8.844e+00  h4_delta_sat=5.107e-01  h4_ls_f=2.882e-02  h4_ls_h=3.321e-02  h4_ls_w=3.355e-02  h8_delta_mag=4.853e-01  h8_delta_sat=1.136e-02  h8_ls_f=2.558e-02  h8_ls_h=1.708e-02  h8_ls_w=2.037e-02  proto_ctx=2.543e-01
+Epoch 028/40 | Train Loss: 1.5387 | Val Dice: N/A
+  [tel] abs_delta=9.468e-02  band_frac=6.012e-02  edge_mean=4.174e-02  h4_delta_mag=9.346e+00  h4_delta_sat=5.138e-01  h4_ls_f=2.891e-02  h4_ls_h=3.344e-02  h4_ls_w=3.362e-02  h8_delta_mag=4.552e-01  h8_delta_sat=8.274e-03  h8_ls_f=2.586e-02  h8_ls_h=1.724e-02  h8_ls_w=2.045e-02  proto_ctx=2.631e-01
+Epoch 029/40 | Train Loss: 1.5115 | Val Dice: N/A
+  [tel] abs_delta=9.132e-02  band_frac=6.005e-02  edge_mean=4.134e-02  h4_delta_mag=9.396e+00  h4_delta_sat=5.171e-01  h4_ls_f=2.903e-02  h4_ls_h=3.341e-02  h4_ls_w=3.367e-02  h8_delta_mag=4.594e-01  h8_delta_sat=8.324e-03  h8_ls_f=2.614e-02  h8_ls_h=1.730e-02  h8_ls_w=2.057e-02  proto_ctx=2.662e-01
+Epoch 030/40 | Train Loss: 1.5028 | Val Dice: N/A
+  [tel] abs_delta=8.754e-02  band_frac=5.980e-02  edge_mean=4.081e-02  h4_delta_mag=9.893e+00  h4_delta_sat=5.401e-01  h4_ls_f=2.910e-02  h4_ls_h=3.349e-02  h4_ls_w=3.366e-02  h8_delta_mag=4.189e-01  h8_delta_sat=5.908e-03  h8_ls_f=2.636e-02  h8_ls_h=1.739e-02  h8_ls_w=2.064e-02  proto_ctx=2.673e-01
+Epoch 031/40 | Train Loss: 1.4711 | Val Dice: N/A
+  [tel] abs_delta=8.797e-02  band_frac=5.945e-02  edge_mean=4.068e-02  h4_delta_mag=1.006e+01  h4_delta_sat=5.302e-01  h4_ls_f=2.914e-02  h4_ls_h=3.348e-02  h4_ls_w=3.366e-02  h8_delta_mag=4.262e-01  h8_delta_sat=6.148e-03  h8_ls_f=2.639e-02  h8_ls_h=1.747e-02  h8_ls_w=2.073e-02  proto_ctx=2.621e-01
+Epoch 032/40 | Train Loss: 1.4875 | Val Dice: N/A
+  [tel] abs_delta=8.925e-02  band_frac=5.966e-02  edge_mean=4.077e-02  h4_delta_mag=9.947e+00  h4_delta_sat=5.269e-01  h4_ls_f=2.922e-02  h4_ls_h=3.352e-02  h4_ls_w=3.370e-02  h8_delta_mag=4.401e-01  h8_delta_sat=7.164e-03  h8_ls_f=2.654e-02  h8_ls_h=1.751e-02  h8_ls_w=2.077e-02  proto_ctx=2.616e-01
+Epoch 033/40 | Train Loss: 1.4768 | Val Dice: N/A
+  [tel] abs_delta=8.981e-02  band_frac=5.978e-02  edge_mean=4.069e-02  h4_delta_mag=1.000e+01  h4_delta_sat=5.322e-01  h4_ls_f=2.923e-02  h4_ls_h=3.352e-02  h4_ls_w=3.371e-02  h8_delta_mag=4.582e-01  h8_delta_sat=7.957e-03  h8_ls_f=2.670e-02  h8_ls_h=1.754e-02  h8_ls_w=2.082e-02  proto_ctx=2.610e-01
+Epoch 034/40 | Train Loss: 1.4372 | Val Dice: N/A
+  [tel] abs_delta=8.965e-02  band_frac=5.929e-02  edge_mean=4.065e-02  h4_delta_mag=9.819e+00  h4_delta_sat=5.241e-01  h4_ls_f=2.930e-02  h4_ls_h=3.351e-02  h4_ls_w=3.373e-02  h8_delta_mag=4.695e-01  h8_delta_sat=8.565e-03  h8_ls_f=2.677e-02  h8_ls_h=1.754e-02  h8_ls_w=2.088e-02  proto_ctx=2.610e-01
+Epoch 035/40 | Train Loss: 1.4286 | Val Dice: N/A
+  [tel] abs_delta=8.805e-02  band_frac=5.920e-02  edge_mean=4.058e-02  h4_delta_mag=9.344e+00  h4_delta_sat=5.114e-01  h4_ls_f=2.936e-02  h4_ls_h=3.352e-02  h4_ls_w=3.372e-02  h8_delta_mag=4.534e-01  h8_delta_sat=7.694e-03  h8_ls_f=2.679e-02  h8_ls_h=1.758e-02  h8_ls_w=2.089e-02  proto_ctx=2.604e-01
+Epoch 036/40 | Train Loss: 1.4333 | Val Dice: N/A
+  [tel] abs_delta=8.759e-02  band_frac=5.935e-02  edge_mean=4.052e-02  h4_delta_mag=9.481e+00  h4_delta_sat=5.150e-01  h4_ls_f=2.941e-02  h4_ls_h=3.353e-02  h4_ls_w=3.373e-02  h8_delta_mag=4.589e-01  h8_delta_sat=8.137e-03  h8_ls_f=2.687e-02  h8_ls_h=1.759e-02  h8_ls_w=2.092e-02  proto_ctx=2.603e-01
+Epoch 037/40 | Train Loss: 1.4308 | Val Dice: N/A
+  [tel] abs_delta=8.743e-02  band_frac=5.931e-02  edge_mean=4.037e-02  h4_delta_mag=9.441e+00  h4_delta_sat=5.144e-01  h4_ls_f=2.942e-02  h4_ls_h=3.355e-02  h4_ls_w=3.374e-02  h8_delta_mag=4.460e-01  h8_delta_sat=7.403e-03  h8_ls_f=2.690e-02  h8_ls_h=1.760e-02  h8_ls_w=2.094e-02  proto_ctx=2.577e-01
+Epoch 038/40 | Train Loss: 1.4314 | Val Dice: N/A
+  [tel] abs_delta=8.724e-02  band_frac=5.935e-02  edge_mean=4.041e-02  h4_delta_mag=9.403e+00  h4_delta_sat=5.070e-01  h4_ls_f=2.944e-02  h4_ls_h=3.355e-02  h4_ls_w=3.374e-02  h8_delta_mag=4.371e-01  h8_delta_sat=6.839e-03  h8_ls_f=2.691e-02  h8_ls_h=1.762e-02  h8_ls_w=2.094e-02  proto_ctx=2.579e-01
+Epoch 039/40 | Train Loss: 1.4240 | Val Dice: N/A
+  [tel] abs_delta=8.740e-02  band_frac=5.932e-02  edge_mean=4.048e-02  h4_delta_mag=9.520e+00  h4_delta_sat=5.187e-01  h4_ls_f=2.946e-02  h4_ls_h=3.356e-02  h4_ls_w=3.375e-02  h8_delta_mag=4.348e-01  h8_delta_sat=6.727e-03  h8_ls_f=2.690e-02  h8_ls_h=1.762e-02  h8_ls_w=2.095e-02  proto_ctx=2.574e-01
+
+--- Zero-shot MONITORING at epoch 40 (not used for checkpoint selection) ---
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8909 | meanIoU: 0.8240 | S-m: 0.9323 | mean E-m: 0.9601 | max E-m: 0.9785 | max Fm(β²=0.3): 0.9217 | wFm: 0.8709 | MAE: 0.0077 | Recall@0.5: 0.9592 | HD95@0.5: 14.87px
+Dataset: CVC-CLINICDB    | meanDice: 0.9225 | meanIoU: 0.8769 | S-m: 0.9445 | mean E-m: 0.9689 | max E-m: 0.9796 | max Fm(β²=0.3): 0.9432 | wFm: 0.9189 | MAE: 0.0078 | Recall@0.5: 0.9575 | HD95@0.5: 10.47px
+Dataset: CVC-COLONDB     | meanDice: 0.8126 | meanIoU: 0.7349 | S-m: 0.8705 | mean E-m: 0.9062 | max E-m: 0.9108 | max Fm(β²=0.3): 0.8304 | wFm: 0.7957 | MAE: 0.0296 | Recall@0.5: 0.8525 | HD95@0.5: 46.71px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.8188 | meanIoU: 0.7392 | S-m: 0.8915 | mean E-m: 0.9242 | max E-m: 0.9352 | max Fm(β²=0.3): 0.8462 | wFm: 0.7769 | MAE: 0.0135 | Recall@0.5: 0.9076 | HD95@0.5: 115.10px
+Dataset: KVASIR          | meanDice: 0.9196 | meanIoU: 0.8693 | S-m: 0.9251 | mean E-m: 0.9593 | max E-m: 0.9644 | max Fm(β²=0.3): 0.9349 | wFm: 0.9138 | MAE: 0.0239 | Recall@0.5: 0.9186 | HD95@0.5: 43.81px
+--- ZS-3 mDice (CVC-300/ColonDB/ETIS): 0.8408  |  mean over all 5 splits (incl. in-domain Kvasir+ClinicDB): 0.8729 ---
+`Trainer.fit` stopped: `max_epochs=40` reached.
+
+Saving lightning_logs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R3/lightning_logs
+
+Saving runs to Drive: /content/drive/MyDrive/WACV_2027_Checkpoints_abl_R3/runs
+Checkpoint backup complete (lightning_logs: 3 copied, 2 unchanged; runs: 1 copied, 11 unchanged).
+
+[train] exit 0 after 1.90 h. Log at /content/drive/MyDrive/abl_R3_log.txt
+
+======================================================================
+SCORING R3 on last.ckpt
+======================================================================
+[score] checkpoint: /content/polp_wacv/lightning_logs/version_0/checkpoints/last.ckpt
+[score] epoch=39 mamba_freq_axis=True use_mamba_bottleneck=True mamba_stage=h4h8 mamba_scan=raster
+--- WACV 2027 Zero-Shot Generalization Protocol (canonical PraNet eval, input 352x352) ---
+Dataset: CVC-300         | meanDice: 0.8909 | meanIoU: 0.8240 | S-m: 0.9323 | mean E-m: 0.9601 | max E-m: 0.9785 | max Fm(β²=0.3): 0.9216 | wFm: 0.8709 | MAE: 0.0077 | Recall@0.5: 0.9592 | HD95@0.5: 14.87px
+Dataset: CVC-CLINICDB    | meanDice: 0.9226 | meanIoU: 0.8769 | S-m: 0.9445 | mean E-m: 0.9689 | max E-m: 0.9797 | max Fm(β²=0.3): 0.9432 | wFm: 0.9189 | MAE: 0.0078 | Recall@0.5: 0.9575 | HD95@0.5: 10.48px
+Dataset: CVC-COLONDB     | meanDice: 0.8126 | meanIoU: 0.7349 | S-m: 0.8706 | mean E-m: 0.9062 | max E-m: 0.9108 | max Fm(β²=0.3): 0.8304 | wFm: 0.7958 | MAE: 0.0296 | Recall@0.5: 0.8525 | HD95@0.5: 46.71px
+Dataset: ETIS-LARIBPOLYPDB | meanDice: 0.8188 | meanIoU: 0.7393 | S-m: 0.8915 | mean E-m: 0.9242 | max E-m: 0.9352 | max Fm(β²=0.3): 0.8462 | wFm: 0.7769 | MAE: 0.0135 | Recall@0.5: 0.9076 | HD95@0.5: 115.09px
+Dataset: KVASIR          | meanDice: 0.9196 | meanIoU: 0.8693 | S-m: 0.9251 | mean E-m: 0.9593 | max E-m: 0.9644 | max Fm(β²=0.3): 0.9349 | wFm: 0.9138 | MAE: 0.0239 | Recall@0.5: 0.9186 | HD95@0.5: 43.81px
+--- R3: released prediction maps, scored on the canonical PraNet estimator ---
+Dataset: CVC-300              | mDice: 0.8909 | mIoU: 0.8240 | S-m: 0.9323 | max E-m: 0.9785 | wFm: 0.8709 | MAE: 0.0077 | Recall@0.5: 0.9592 | HD95@0.5: 14.87px | n=60/60
+Dataset: CVC-CLINICDB         | mDice: 0.9226 | mIoU: 0.8769 | S-m: 0.9445 | max E-m: 0.9797 | wFm: 0.9189 | MAE: 0.0078 | Recall@0.5: 0.9575 | HD95@0.5: 10.48px | n=62/62
+Dataset: CVC-COLONDB          | mDice: 0.8126 | mIoU: 0.7349 | S-m: 0.8706 | max E-m: 0.9108 | wFm: 0.7958 | MAE: 0.0296 | Recall@0.5: 0.8525 | HD95@0.5: 46.71px | n=380/380
+Dataset: ETIS-LARIBPOLYPDB    | mDice: 0.8188 | mIoU: 0.7393 | S-m: 0.8915 | max E-m: 0.9352 | wFm: 0.7769 | MAE: 0.0135 | Recall@0.5: 0.9076 | HD95@0.5: 115.09px | n=196/196
+Dataset: KVASIR               | mDice: 0.9196 | mIoU: 0.8693 | S-m: 0.9251 | max E-m: 0.9644 | wFm: 0.9138 | MAE: 0.0239 | Recall@0.5: 0.9186 | HD95@0.5: 43.81px | n=100/100
+
+ZS-3 mean mDice (CVC-300 / ColonDB / ETIS): 0.8408
+wrote /content/polp_wacv/runs/abl_R3.json
+[config] encoder=pvt_v2_b2 use_fcc_decoder=True fcc_channel=64 fcc_reduce_octave=False fcc_region_calib=True fcc_region_proto=True use_boundary_attn=False use_wavelet_decoder=False use_rfp=False use_mamba_bottleneck=True mamba_bidirectional=True mamba_stage=h4h8 mamba_scan=raster mamba_freq_axis=True freq_gain=clamp freq_gain_scale=3.0 freq_gain_shared=False third_axis=freq edge_stride=4 — pass these flags to match the checkpoint you're profiling.
+Params (M):   34.85
+GMACs:        16.366  [thop, input 352x352, batch=1 — THIS IS THE PAPER NUMBER, same tool every competitor row used]
+FLOPs (G):    32.73  [2 x MACs; do not mix the two conventions in one column]
+FPS:          26.4  [batch=1, input 352x352, 100 reps]
+Peak GPU mem: 5.82 GB  [fwd+bwd, batch=8]
+[params] R3: 34.85 M vs expected 34.85 M -- OK
+[check] monitor ZS-3 @ep40: 0.8408  |  scored from last.ckpt: 0.8408  |  delta +0.0000
+[disk] pruned 0.79 GB of intermediate checkpoints from WACV_2027_Checkpoints_abl_R3 (last.ckpt kept).
+
+======================================================================
+ARM R3 COMPLETE — 1.90 h training
+  Kvasir               mDice 0.9196
+  CVC-ClinicDB         mDice 0.9226
+  CVC-300              mDice 0.8909
+  CVC-ColonDB          mDice 0.8126
+  ETIS-LaribPolypDB    mDice 0.8188
+  (internal ZS-3)      0.8408  monitor 0.8408
+  params                      : 34.85 M
+  scored from                 : last.ckpt @ epoch 39
+  backed up to Drive          : abl_R3.json, abl_R3_cost.txt, abl_R3_seed0.json, preds_R3.zip
+======================================================================
+
+
+======================================================================
+SWEEP FINISHED — 6.7 h
+======================================================================
+  arm   params    Kvasir       CVC       CVC       CVC      ETIS   row
+  R0   31.47 M    0.9053    0.9244    0.8926    0.8053    0.8056   BASELINE — PVTv2-B2 + U-shaped decoder
+  R1   34.77 M    0.9150    0.9139    0.8896    0.7974    0.7996   + frequency-decomposed octave decoder 
+  R2   34.85 M    0.9159    0.9325    0.8872    0.7988    0.7896   + boundary-region calibration, boundar
+  R3   34.85 M    0.9196    0.9226    0.8909    0.8126    0.8188   FULL — + endoscopy augmentation and HA
+
+  Δ vs R3 — the full shipped configuration. Each component wants its own arm BELOW it.
+
+  Δ vs R0 — the Baseline row. Each cumulative step wants to be ABOVE it, and above the step before it -- check the ladder per dataset, not on the mean.
+  R1             +0.0096   -0.0105   -0.0030   -0.0079   -0.0060   above on 1/5
+  R2             +0.0105   +0.0081   -0.0054   -0.0065   -0.0161   above on 2/5
+  R3             +0.0143   -0.0018   -0.0017   +0.0073   +0.0132   above on 3/5
+======================================================================
+
+Everything is on Drive. Per-arm results: WACV_2027_Checkpoints_abl_<ARM>/runs/
+The whole table, ready to paste : /content/drive/MyDrive/abl_summary.csv
+Machine-readable status         : /content/drive/MyDrive/abl_progress.json
+Per-epoch tel/* for Figure 5    : /content/drive/MyDrive/abl_<ARM>_log.txt
+
+How to read C0-C5: every arm BELOW M5 is that component earning its place. An arm that
+comes out ABOVE M5 means cut the component from the paper's contribution list — it does
+NOT mean drop the row from a table you are printing.
+
+Next: rebuild the paper table with
+  python scripts/make_ablation_table.py
+It refuses any row without provenance, any souped checkpoint, anything not scored from
+last.ckpt, and any row on a different epoch budget — so a bad arm cannot reach the draft.

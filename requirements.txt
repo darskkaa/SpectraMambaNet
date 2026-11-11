@@ -1,0 +1,15 @@
+torch>=2.0.0
+pytorch-lightning
+tensorboard
+timm
+albumentations
+opencv-python
+numpy
+Pillow
+scipy
+pysodmetrics
+PyWavelets
+thop
+gdown
+# Training also needs the CUDA selective-scan kernels in requirements_colab.txt. Without
+# them, src/model/mamba_ref.py stands in for evaluation only.

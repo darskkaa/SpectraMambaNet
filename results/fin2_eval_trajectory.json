@@ -1,0 +1,418 @@
+[
+  {
+    "epoch": 5,
+    "sets": {
+      "CVC-300": 0.8801,
+      "CVC-CLINICDB": 0.8764,
+      "CVC-COLONDB": 0.7821,
+      "ETIS-LARIBPOLYPDB": 0.7921,
+      "KVASIR": 0.8848
+    },
+    "zs3": 0.8181,
+    "five": 0.8431,
+    "indomain": 0.8806
+  },
+  {
+    "epoch": 10,
+    "sets": {
+      "CVC-300": 0.866,
+      "CVC-CLINICDB": 0.8956,
+      "CVC-COLONDB": 0.7782,
+      "ETIS-LARIBPOLYPDB": 0.7648,
+      "KVASIR": 0.9151
+    },
+    "zs3": 0.803,
+    "five": 0.8439,
+    "indomain": 0.9053
+  },
+  {
+    "epoch": 15,
+    "sets": {
+      "CVC-300": 0.8769,
+      "CVC-CLINICDB": 0.927,
+      "CVC-COLONDB": 0.7896,
+      "ETIS-LARIBPOLYPDB": 0.8024,
+      "KVASIR": 0.922
+    },
+    "zs3": 0.823,
+    "five": 0.8636,
+    "indomain": 0.9245
+  },
+  {
+    "epoch": 20,
+    "sets": {
+      "CVC-300": 0.879,
+      "CVC-CLINICDB": 0.9283,
+      "CVC-COLONDB": 0.7973,
+      "ETIS-LARIBPOLYPDB": 0.816,
+      "KVASIR": 0.9186
+    },
+    "zs3": 0.8308,
+    "five": 0.8679,
+    "indomain": 0.9234
+  },
+  {
+    "epoch": 25,
+    "sets": {
+      "CVC-300": 0.8651,
+      "CVC-CLINICDB": 0.9254,
+      "CVC-COLONDB": 0.7855,
+      "ETIS-LARIBPOLYPDB": 0.757,
+      "KVASIR": 0.9128
+    },
+    "zs3": 0.8025,
+    "five": 0.8492,
+    "indomain": 0.9191
+  },
+  {
+    "epoch": 30,
+    "sets": {
+      "CVC-300": 0.8653,
+      "CVC-CLINICDB": 0.9172,
+      "CVC-COLONDB": 0.8035,
+      "ETIS-LARIBPOLYPDB": 0.7909,
+      "KVASIR": 0.9153
+    },
+    "zs3": 0.8199,
+    "five": 0.8584,
+    "indomain": 0.9163
+  },
+  {
+    "epoch": 35,
+    "sets": {
+      "CVC-300": 0.8965,
+      "CVC-CLINICDB": 0.9175,
+      "CVC-COLONDB": 0.8119,
+      "ETIS-LARIBPOLYPDB": 0.8063,
+      "KVASIR": 0.923
+    },
+    "zs3": 0.8383,
+    "five": 0.871,
+    "indomain": 0.9203
+  },
+  {
+    "epoch": 40,
+    "sets": {
+      "CVC-300": 0.8921,
+      "CVC-CLINICDB": 0.9184,
+      "CVC-COLONDB": 0.8166,
+      "ETIS-LARIBPOLYPDB": 0.8203,
+      "KVASIR": 0.9265
+    },
+    "zs3": 0.843,
+    "five": 0.8748,
+    "indomain": 0.9224
+  },
+  {
+    "epoch": 45,
+    "sets": {
+      "CVC-300": 0.8779,
+      "CVC-CLINICDB": 0.9281,
+      "CVC-COLONDB": 0.7894,
+      "ETIS-LARIBPOLYPDB": 0.8081,
+      "KVASIR": 0.91
+    },
+    "zs3": 0.8251,
+    "five": 0.8627,
+    "indomain": 0.9191
+  },
+  {
+    "epoch": 50,
+    "sets": {
+      "CVC-300": 0.8766,
+      "CVC-CLINICDB": 0.9192,
+      "CVC-COLONDB": 0.7896,
+      "ETIS-LARIBPOLYPDB": 0.7917,
+      "KVASIR": 0.9226
+    },
+    "zs3": 0.8193,
+    "five": 0.8599,
+    "indomain": 0.9209
+  },
+  {
+    "epoch": 55,
+    "sets": {
+      "CVC-300": 0.8817,
+      "CVC-CLINICDB": 0.9214,
+      "CVC-COLONDB": 0.8084,
+      "ETIS-LARIBPOLYPDB": 0.805,
+      "KVASIR": 0.9243
+    },
+    "zs3": 0.8317,
+    "five": 0.8682,
+    "indomain": 0.9228
+  },
+  {
+    "epoch": 60,
+    "sets": {
+      "CVC-300": 0.8827,
+      "CVC-CLINICDB": 0.9217,
+      "CVC-COLONDB": 0.8088,
+      "ETIS-LARIBPOLYPDB": 0.8036,
+      "KVASIR": 0.9205
+    },
+    "zs3": 0.8317,
+    "five": 0.8675,
+    "indomain": 0.9211
+  },
+  {
+    "epoch": 65,
+    "sets": {
+      "CVC-300": 0.8872,
+      "CVC-CLINICDB": 0.9195,
+      "CVC-COLONDB": 0.7737,
+      "ETIS-LARIBPOLYPDB": 0.7647,
+      "KVASIR": 0.9148
+    },
+    "zs3": 0.8085,
+    "five": 0.852,
+    "indomain": 0.9171
+  },
+  {
+    "epoch": 70,
+    "sets": {
+      "CVC-300": 0.9123,
+      "CVC-CLINICDB": 0.9293,
+      "CVC-COLONDB": 0.7904,
+      "ETIS-LARIBPOLYPDB": 0.8123,
+      "KVASIR": 0.913
+    },
+    "zs3": 0.8383,
+    "five": 0.8714,
+    "indomain": 0.9212
+  },
+  {
+    "epoch": 75,
+    "sets": {
+      "CVC-300": 0.9059,
+      "CVC-CLINICDB": 0.9358,
+      "CVC-COLONDB": 0.8087,
+      "ETIS-LARIBPOLYPDB": 0.8138,
+      "KVASIR": 0.9095
+    },
+    "zs3": 0.8428,
+    "five": 0.8747,
+    "indomain": 0.9226
+  },
+  {
+    "epoch": 80,
+    "sets": {
+      "CVC-300": 0.9023,
+      "CVC-CLINICDB": 0.9362,
+      "CVC-COLONDB": 0.8116,
+      "ETIS-LARIBPOLYPDB": 0.8144,
+      "KVASIR": 0.9122
+    },
+    "zs3": 0.8428,
+    "five": 0.8753,
+    "indomain": 0.9242
+  },
+  {
+    "epoch": 85,
+    "sets": {
+      "CVC-300": 0.8577,
+      "CVC-CLINICDB": 0.9046,
+      "CVC-COLONDB": 0.7938,
+      "ETIS-LARIBPOLYPDB": 0.796,
+      "KVASIR": 0.8972
+    },
+    "zs3": 0.8158,
+    "five": 0.8499,
+    "indomain": 0.9009
+  },
+  {
+    "epoch": 90,
+    "sets": {
+      "CVC-300": 0.8846,
+      "CVC-CLINICDB": 0.9182,
+      "CVC-COLONDB": 0.8158,
+      "ETIS-LARIBPOLYPDB": 0.8195,
+      "KVASIR": 0.9169
+    },
+    "zs3": 0.84,
+    "five": 0.871,
+    "indomain": 0.9176
+  },
+  {
+    "epoch": 95,
+    "sets": {
+      "CVC-300": 0.8857,
+      "CVC-CLINICDB": 0.923,
+      "CVC-COLONDB": 0.8147,
+      "ETIS-LARIBPOLYPDB": 0.8266,
+      "KVASIR": 0.9094
+    },
+    "zs3": 0.8423,
+    "five": 0.8719,
+    "indomain": 0.9162
+  },
+  {
+    "epoch": 100,
+    "sets": {
+      "CVC-300": 0.8874,
+      "CVC-CLINICDB": 0.9238,
+      "CVC-COLONDB": 0.8172,
+      "ETIS-LARIBPOLYPDB": 0.8256,
+      "KVASIR": 0.9078
+    },
+    "zs3": 0.8434,
+    "five": 0.8724,
+    "indomain": 0.9158
+  },
+  {
+    "epoch": 105,
+    "sets": {
+      "CVC-300": 0.8543,
+      "CVC-CLINICDB": 0.9162,
+      "CVC-COLONDB": 0.8199,
+      "ETIS-LARIBPOLYPDB": 0.7899,
+      "KVASIR": 0.9108
+    },
+    "zs3": 0.8214,
+    "five": 0.8582,
+    "indomain": 0.9135
+  },
+  {
+    "epoch": 110,
+    "sets": {
+      "CVC-300": 0.8573,
+      "CVC-CLINICDB": 0.9148,
+      "CVC-COLONDB": 0.8144,
+      "ETIS-LARIBPOLYPDB": 0.7668,
+      "KVASIR": 0.9157
+    },
+    "zs3": 0.8128,
+    "five": 0.8538,
+    "indomain": 0.9152
+  },
+  {
+    "epoch": 115,
+    "sets": {
+      "CVC-300": 0.8983,
+      "CVC-CLINICDB": 0.9168,
+      "CVC-COLONDB": 0.8253,
+      "ETIS-LARIBPOLYPDB": 0.7899,
+      "KVASIR": 0.9214
+    },
+    "zs3": 0.8378,
+    "five": 0.8703,
+    "indomain": 0.9191
+  },
+  {
+    "epoch": 120,
+    "sets": {
+      "CVC-300": 0.8927,
+      "CVC-CLINICDB": 0.9236,
+      "CVC-COLONDB": 0.8274,
+      "ETIS-LARIBPOLYPDB": 0.798,
+      "KVASIR": 0.922
+    },
+    "zs3": 0.8394,
+    "five": 0.8728,
+    "indomain": 0.9228
+  },
+  {
+    "epoch": 125,
+    "sets": {
+      "CVC-300": 0.8992,
+      "CVC-CLINICDB": 0.9226,
+      "CVC-COLONDB": 0.801,
+      "ETIS-LARIBPOLYPDB": 0.8207,
+      "KVASIR": 0.9289
+    },
+    "zs3": 0.8403,
+    "five": 0.8745,
+    "indomain": 0.9257
+  },
+  {
+    "epoch": 130,
+    "sets": {
+      "CVC-300": 0.8868,
+      "CVC-CLINICDB": 0.9192,
+      "CVC-COLONDB": 0.8078,
+      "ETIS-LARIBPOLYPDB": 0.8089,
+      "KVASIR": 0.9132
+    },
+    "zs3": 0.8345,
+    "five": 0.8672,
+    "indomain": 0.9162
+  },
+  {
+    "epoch": 135,
+    "sets": {
+      "CVC-300": 0.8805,
+      "CVC-CLINICDB": 0.9197,
+      "CVC-COLONDB": 0.8141,
+      "ETIS-LARIBPOLYPDB": 0.7921,
+      "KVASIR": 0.9081
+    },
+    "zs3": 0.8289,
+    "five": 0.8629,
+    "indomain": 0.9139
+  },
+  {
+    "epoch": 140,
+    "sets": {
+      "CVC-300": 0.8922,
+      "CVC-CLINICDB": 0.9219,
+      "CVC-COLONDB": 0.8099,
+      "ETIS-LARIBPOLYPDB": 0.8029,
+      "KVASIR": 0.9044
+    },
+    "zs3": 0.835,
+    "five": 0.8663,
+    "indomain": 0.9132
+  },
+  {
+    "epoch": 145,
+    "sets": {
+      "CVC-300": 0.8843,
+      "CVC-CLINICDB": 0.921,
+      "CVC-COLONDB": 0.8102,
+      "ETIS-LARIBPOLYPDB": 0.7841,
+      "KVASIR": 0.9246
+    },
+    "zs3": 0.8262,
+    "five": 0.8648,
+    "indomain": 0.9228
+  },
+  {
+    "epoch": 150,
+    "sets": {
+      "CVC-300": 0.8821,
+      "CVC-CLINICDB": 0.9404,
+      "CVC-COLONDB": 0.8022,
+      "ETIS-LARIBPOLYPDB": 0.7714,
+      "KVASIR": 0.9249
+    },
+    "zs3": 0.8186,
+    "five": 0.8642,
+    "indomain": 0.9326
+  },
+  {
+    "epoch": 155,
+    "sets": {
+      "CVC-300": 0.8863,
+      "CVC-CLINICDB": 0.9221,
+      "CVC-COLONDB": 0.8074,
+      "ETIS-LARIBPOLYPDB": 0.8009,
+      "KVASIR": 0.9203
+    },
+    "zs3": 0.8315,
+    "five": 0.8674,
+    "indomain": 0.9212
+  },
+  {
+    "epoch": 160,
+    "sets": {
+      "CVC-300": 0.889,
+      "CVC-CLINICDB": 0.9231,
+      "CVC-COLONDB": 0.8141,
+      "ETIS-LARIBPOLYPDB": 0.8084,
+      "KVASIR": 0.916
+    },
+    "zs3": 0.8372,
+    "five": 0.8701,
+    "indomain": 0.9196
+  }
+]

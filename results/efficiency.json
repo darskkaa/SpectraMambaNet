@@ -1,0 +1,68 @@
+[
+  {
+    "model": "polyp_pvt",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 25.107604,
+    "gmacs": 10.018439293,
+    "note": "channel=32; the control for the whole cost column (published 10.1 G)"
+  },
+  {
+    "model": "fccnet",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 32.831559,
+    "gmacs": 12.290809088,
+    "note": "channel=32; the origin of our octave-conv decoder"
+  },
+  {
+    "model": "pranet",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 32.547319,
+    "gmacs": 13.149645476,
+    "note": "Res2Net-50 backbone; anchors against three mutually inconsistent published values"
+  },
+  {
+    "model": "ctnet",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 44.290657,
+    "gmacs": 15.13932864,
+    "note": "MiT-b3 backbone; highest-scoring model in our table that ships code AND prediction maps"
+  },
+  {
+    "model": "cfanet",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 25.830318,
+    "gmacs": 55.36047584,
+    "note": "Res2Net-50 two-stream + boundary branch; channel=64 is what its own train.py builds"
+  },
+  {
+    "model": "pranet_v2",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 30.797658,
+    "gmacs": 11.230400104,
+    "note": "PVT-PraNet-V2, the PVTv2-b2 variant \u2014 same encoder as ours, so the closest cost peer"
+  },
+  {
+    "model": "emcad",
+    "size": 352,
+    "device": "cpu",
+    "params_m": 26.764411,
+    "gmacs": 10.579868042,
+    "note": "EMCADNet, the backbone Polyp-DiFoM's best row is built on; vendored inside PraNet-V2"
+  },
+  {
+    "model": "ours",
+    "size": 352,
+    "device": "cuda (NVIDIA L4)",
+    "params_m": 34.85415,
+    "gmacs_traced": 16.366,
+    "gmacs_with_scan_floor": 18.773,
+    "fps_batch1": 26.4,
+    "note": "SpectraMambaNet at the fin2 run-config, contrastive projection head discarded. thop traces no operations inside the selective-scan kernel, so gmacs_traced is the lower bound the published convention yields and gmacs_with_scan_floor adds an analytic floor for the untraced scans. Both appear in the paper as 16.37 (18.77)."
+  }
+]

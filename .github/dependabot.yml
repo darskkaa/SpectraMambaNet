@@ -1,0 +1,12 @@
+# Only the workflow actions are updated. The Python requirements stay as the published run
+# used them; requirements_colab.txt pins its kernels to that run on purpose.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns:
+          - "*"
